@@ -1,0 +1,166 @@
+name: deploy-azure-webapp
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-azure-webapp-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ARTIFACT_NAME: azure-webapp-package
+  NODE_VERSION: '20'
+
+jobs:
+  validate:
+    name: Validate and package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: npm
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+
+      - name: Package Azure App Service bundle
+        run: |
+          npm run package:azure
+          cd dist/azure-webapp
+          zip -qr ../azure-webapp.zip .
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: error
+          name: ${{ env.ARTIFACT_NAME }}
+          path: dist/azure-webapp.zip
+
+  deploy:
+    name: Deploy to Azure App Service
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: ${{ vars.GITHUB_DEPLOYMENT_ENVIRONMENT || 'production' }}
+      url: ${{ steps.deploy.outputs.webapp-url }}
+    env:
+      AZURE_APP_NAME: ${{ vars.AZURE_APP_NAME }}
+      AZURE_APP_SERVICE_PLAN_NAME: ${{ vars.AZURE_APP_SERVICE_PLAN_NAME }}
+      AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+      AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+      BLOG_SOURCE_BRANCH: ${{ vars.BLOG_SOURCE_BRANCH }}
+      BLOG_SOURCE_OWNER: ${{ vars.BLOG_SOURCE_OWNER }}
+      BLOG_SOURCE_PATH: ${{ vars.BLOG_SOURCE_PATH }}
+      BLOG_SOURCE_PROVIDER: ${{ vars.BLOG_SOURCE_PROVIDER }}
+      BLOG_SOURCE_REPO: ${{ vars.BLOG_SOURCE_REPO }}
+      BLOG_SOURCE_TOKEN: ${{ secrets.BLOG_SOURCE_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: dist
+
+      - name: Login to Azure with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+
+      - name: Resolve deployment defaults
+        run: |
+          : "${AZURE_LOCATION:=swedencentral}"
+          : "${AZURE_APP_SERVICE_PLAN_NAME:=${AZURE_APP_NAME}-plan}"
+          : "${BLOG_SOURCE_PROVIDER:=local}"
+          : "${BLOG_SOURCE_PATH:=content/blog}"
+          : "${BLOG_SOURCE_BRANCH:=main}"
+          {
+            echo "AZURE_APP_SERVICE_PLAN_NAME=$AZURE_APP_SERVICE_PLAN_NAME"
+            echo "AZURE_LOCATION=$AZURE_LOCATION"
+            echo "BLOG_SOURCE_BRANCH=$BLOG_SOURCE_BRANCH"
+            echo "BLOG_SOURCE_PATH=$BLOG_SOURCE_PATH"
+            echo "BLOG_SOURCE_PROVIDER=$BLOG_SOURCE_PROVIDER"
+          } >> "$GITHUB_ENV"
+
+      - name: Validate GitHub environment variables
+        run: |
+          missing=0
+
+          for name in AZURE_RESOURCE_GROUP AZURE_APP_NAME; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::$name is required in the GitHub environment variables."
+              missing=1
+            fi
+          done
+
+          if [ "$BLOG_SOURCE_PROVIDER" = "github" ]; then
+            for name in BLOG_SOURCE_OWNER BLOG_SOURCE_REPO; do
+              if [ -z "${!name:-}" ]; then
+                echo "::error::$name is required when BLOG_SOURCE_PROVIDER=github."
+                missing=1
+              fi
+            done
+          fi
+
+          exit "$missing"
+
+      - name: Provision Azure resources
+        run: |
+          az deployment group create \
+            --name "github-${GITHUB_RUN_NUMBER}" \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --template-file infra/azure/main.bicep \
+            --parameters \
+              appName="$AZURE_APP_NAME" \
+              appServicePlanName="$AZURE_APP_SERVICE_PLAN_NAME" \
+              location="$AZURE_LOCATION" \
+              blogSourceProvider="$BLOG_SOURCE_PROVIDER" \
+              blogSourcePath="$BLOG_SOURCE_PATH" \
+              blogSourceOwner="$BLOG_SOURCE_OWNER" \
+              blogSourceRepo="$BLOG_SOURCE_REPO" \
+              blogSourceBranch="$BLOG_SOURCE_BRANCH" \
+              blogSourceToken="$BLOG_SOURCE_TOKEN"
+
+      - id: deploy
+        name: Deploy application package
+        run: |
+          az webapp deploy \
+            --name "$AZURE_APP_NAME" \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --src-path dist/azure-webapp.zip \
+            --type zip
+
+          echo "webapp-url=https://${AZURE_APP_NAME}.azurewebsites.net" >> "$GITHUB_OUTPUT"

@@ -94,7 +94,7 @@
 }
 
 /* Preview mode puts the language above the code, like render-markdown.nvim. */
-:global(.nv-preview) .pre[data-language]::before {
+:global(:root:not([data-view="source"]) .nv-preview) .pre[data-language]::before {
   display: block;
   float: none;
   margin: -0.2rem 0 0.5rem;

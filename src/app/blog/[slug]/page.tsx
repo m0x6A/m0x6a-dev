@@ -9,6 +9,7 @@ import {
   TableOfContents,
 } from "@/components/nvim-pane";
 import { TmuxShell } from "@/components/tmux-shell";
+import { ViewToggle } from "@/components/view-toggle";
 import { countLines, extractHeadings, readingMinutes } from "@/lib/blog/headings";
 import { getBlogIndex, getBlogPost } from "@/lib/blog/posts";
 import styles from "../blog.module.css";
@@ -98,6 +99,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   const { post } = result;
   const headings = extractHeadings(post.content);
+  const lineCount = countLines(post.content);
 
   return (
     <TmuxShell activeWindow="blog" statusRight={`${fileName} · ${post.publishedLabel}`}>
@@ -106,10 +108,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         fileName={fileName}
         fileType="markdown"
         tone="preview"
-        message={`"${fileName}" [preview] ${countLines(post.content)}L`}
+        actions={<ViewToggle />}
+        message={
+          <>
+            <span className="preview-only">{`"${fileName}" [preview] ${lineCount}L`}</span>
+            <span className="source-only">{`"${fileName}" [readonly] ${lineCount}L`}</span>
+          </>
+        }
       >
         <article className={`nv-preview ${styles.article}`}>
-          <header className={`nv-lines ${styles.postHeader}`}>
+          <header className={`nv-lines ${styles.postHeader} preview-only`}>
             <h1>{post.title}</h1>
             <p className={styles.postMeta}>
               <time dateTime={post.publishedAt}>{post.publishedAt}</time>
@@ -118,13 +126,32 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </p>
             <p className={styles.postSummary}>{post.summary}</p>
           </header>
+          <header className={`nv-lines ${styles.frontmatter} source-only`}>
+            <p className={styles.fence} aria-hidden="true">
+              ---
+            </p>
+            <p>
+              <span className={styles.yamlKey}>publishedAt:</span>{" "}
+              <time dateTime={post.publishedAt} className={styles.yamlValue}>
+                {post.publishedAt}
+              </time>
+            </p>
+            <p>
+              <span className={styles.yamlKey}>summary:</span>{" "}
+              <span className={styles.yamlString}>&quot;{post.summary}&quot;</span>
+            </p>
+            <p className={styles.fence} aria-hidden="true">
+              ---
+            </p>
+            <h1>{post.title}</h1>
+          </header>
           <BlogMarkdown content={post.content} />
         </article>
       </NvimPane>
 
       <ShellPane label="Table of contents">
         <TableOfContents fileName={fileName} headings={headings} />
-        <KeyHints />
+        <KeyHints extra={[{ label: "p", value: "preview / source" }]} />
       </ShellPane>
     </TmuxShell>
   );

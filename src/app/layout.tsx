@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
+import { VIEW_INIT_SCRIPT } from "@/lib/view-mode";
 import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -23,7 +24,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={jetbrainsMono.variable}>
+    // suppressHydrationWarning: the init script may set data-view before React hydrates.
+    <html lang="en" className={jetbrainsMono.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: VIEW_INIT_SCRIPT }} />
+      </head>
       <body>{children}</body>
     </html>
   );

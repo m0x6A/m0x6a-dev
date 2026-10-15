@@ -1,59 +1,121 @@
 .content {
-  display: grid;
-  gap: 1.25rem;
-  color: var(--foreground);
-  line-height: 1.8;
-}
-
-.content h2,
-.content h3,
-.content h4 {
-  margin-top: 0.8rem;
+  color: var(--nv-fg);
 }
 
 .content p,
 .content ul,
-.content ol,
-.content blockquote {
-  color: var(--muted);
+.content ol {
+  color: var(--nv-fg-dark);
+}
+
+.content strong {
+  color: var(--nv-fg);
+}
+
+.content em {
+  color: var(--nv-magenta);
 }
 
 .content ul,
 .content ol {
-  padding-left: 1.3rem;
+  padding-left: 2ch;
+}
+
+.content ul {
+  list-style: "● ";
+}
+
+.content ul ul {
+  list-style: "○ ";
+}
+
+.content li::marker {
+  color: var(--nv-orange);
 }
 
 .content li + li {
-  margin-top: 0.45rem;
+  margin-top: 0.35rem;
 }
 
 .content blockquote {
-  margin: 0;
-  padding-left: 1rem;
-  border-left: 3px solid var(--accent);
+  padding-left: 1.5ch;
+  border-left: 2px solid var(--nv-magenta);
+  color: var(--nv-muted);
+  font-style: italic;
+}
+
+.content hr {
+  height: 0;
+  border: 0;
+  border-top: 1px dashed var(--nv-gutter);
+  margin: 0.85rem 0;
 }
 
 .link {
-  color: var(--accent);
+  color: var(--nv-blue);
+  text-decoration: underline;
+  text-decoration-color: rgba(122, 162, 247, 0.4);
+  text-underline-offset: 3px;
 }
 
-.inlineCode,
-.pre {
-  font-family: var(--font-mono);
+.link:hover {
+  text-decoration-color: var(--nv-blue);
 }
 
 .inlineCode {
-  padding: 0.15rem 0.35rem;
-  border-radius: 0.4rem;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--foreground);
+  padding: 0.1rem 0.4ch;
+  background: var(--nv-bg-highlight);
+  color: var(--nv-green1);
+  font-size: 0.95em;
 }
 
 .pre {
   margin: 0;
-  padding: 1rem;
-  border-radius: 1rem;
-  border: 1px solid var(--border);
-  background: rgba(2, 10, 18, 0.9);
+  padding: 0.9rem 1.25ch;
+  border-left: 2px solid var(--nv-gutter);
+  background: var(--nv-bg-dark);
   overflow-x: auto;
+  line-height: 1.6;
+  font-size: 0.93em;
+}
+
+.pre[data-language]::before {
+  content: attr(data-language);
+  content: attr(data-language) / "";
+  float: right;
+  margin: -0.2rem -0.25ch 0 2ch;
+  color: var(--nv-muted);
+  font-size: 0.8rem;
+}
+
+.pre code {
+  color: var(--nv-fg);
+}
+
+.tableScroll {
+  overflow-x: auto;
+}
+
+.tableScroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.93em;
+  line-height: 1.55;
+}
+
+.tableScroll th,
+.tableScroll td {
+  padding: 0.4rem 1ch;
+  border: 1px solid var(--nv-gutter);
+  text-align: left;
+  vertical-align: top;
+}
+
+.tableScroll th {
+  background: var(--nv-bg-dark);
+  color: var(--nv-blue);
+}
+
+.tableScroll td {
+  color: var(--nv-fg-dark);
 }

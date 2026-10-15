@@ -1,6 +1,6 @@
 # Architecture overview
 
-The m0x6a site is a single Next.js 16 App Router application (React 19, TypeScript). It serves a CLI-styled portfolio and a Markdown blog loaded from a configurable Git source. It is deployed to Azure App Service as a standalone Node server.
+The m0x6a site is a single Next.js 16 App Router application (React 19, TypeScript). It serves a portfolio styled as tmux running Neovim and a Markdown blog loaded from a configurable Git source. It is deployed to Azure App Service as a standalone Node server.
 
 ## Components
 
@@ -13,8 +13,9 @@ src/
 │   ├── layout.tsx, globals.css               root layout + design tokens
 │   └── not-found.tsx
 ├── components/
-│   ├── site-shell.tsx         shared layout + navigation
-│   ├── state-panel.tsx        empty / unavailable / not-found panels
+│   ├── tmux-shell.tsx         shared tmux frame; status bar is the primary navigation
+│   ├── nvim-pane.tsx          Neovim pane, zsh side pane, BufferNotice error/empty states
+│   ├── vim-motions.tsx        client: j/k, gg/G, H/L and the scroll indicator
 │   └── blog-markdown.tsx      react-markdown + remark-gfm renderer
 ├── content/portfolio.ts       typed portfolio content
 └── lib/blog/
@@ -22,6 +23,7 @@ src/
     ├── adapter.ts             BlogSourceAdapter interface
     ├── local-adapter.ts       filesystem provider
     ├── github-adapter.ts      GitHub contents API provider
+    ├── headings.ts            heading ids and table of contents
     ├── posts.ts               load, normalize, sort, dedupe, map to result states
     ├── errors.ts              BlogSourceUnavailableError
     └── types.ts               config, post and result types
@@ -39,7 +41,7 @@ page.tsx ──► getBlogIndex() / getBlogPost(slug)        (posts.ts, React ca
                └─ sort desc by publishedAt, dedupe slugs
                      │
                      ▼
-        ready | empty | unavailable | not_found  ──►  page renders content or StatePanel
+        ready | empty | unavailable | not_found  ──►  page renders content or BufferNotice
 ```
 
 See [ADR-0004](../adr/0004-server-side-blog-source-adapter.md) and [ADR-0007](../adr/0007-isolate-blog-failures.md).

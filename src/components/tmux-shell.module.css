@@ -1,0 +1,139 @@
+/* Tokyo Night (night) palette, scoped to the tmux shell. */
+.tmux {
+  --nv-bg: #1a1b26;
+  --nv-bg-dark: #16161e;
+  --nv-bg-highlight: #292e42;
+  --nv-black: #15161e;
+  --nv-gutter: #3b4261;
+  --nv-line-nr: #414868;
+  --nv-fg: #c0caf5;
+  --nv-fg-dark: #a9b1d6;
+  --nv-comment: #565f89;
+  --nv-muted: #787fa8;
+  --nv-blue: #7aa2f7;
+  --nv-cyan: #7dcfff;
+  --nv-blue1: #2ac3de;
+  --nv-magenta: #bb9af7;
+  --nv-orange: #ff9e64;
+  --nv-yellow: #e0af68;
+  --nv-green: #9ece6a;
+  --nv-green1: #73daca;
+  --nv-red: #f7768e;
+  --nv-border-active: #7aa2f7;
+
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--nv-bg);
+  color: var(--nv-fg);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-variant-ligatures: none;
+}
+
+.skipLink {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10;
+  padding: 0.25rem 0.75rem;
+  background: var(--nv-blue);
+  color: var(--nv-black);
+  font-weight: 700;
+  transform: translateY(-200%);
+}
+
+.skipLink:focus {
+  transform: none;
+}
+
+.panes {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.statusBar {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  min-height: 1.75rem;
+  background: var(--nv-bg-dark);
+  color: var(--nv-fg-dark);
+  font-size: 0.85rem;
+  line-height: 1.75rem;
+  white-space: nowrap;
+}
+
+/* Powerline-style segment with an arrow on its right edge. */
+.session,
+.activeWindow {
+  padding: 0 1.1rem 0 0.75rem;
+  clip-path: polygon(0 0, calc(100% - 0.55rem) 0, 100% 50%, calc(100% - 0.55rem) 100%, 0 100%);
+}
+
+.session {
+  background: var(--nv-blue);
+  color: var(--nv-black);
+  font-weight: 700;
+}
+
+.windows {
+  display: flex;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.window {
+  padding: 0 0.75rem;
+  color: var(--nv-muted);
+}
+
+.window:hover,
+.window:focus-visible {
+  color: var(--nv-fg);
+}
+
+.activeWindow {
+  margin-left: -0.3rem;
+  padding-left: 1rem;
+  background: var(--nv-gutter);
+  color: var(--nv-blue);
+  font-weight: 700;
+}
+
+.statusRight {
+  margin-left: auto;
+  padding: 0 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--nv-muted);
+}
+
+.host {
+  padding: 0 0.75rem 0 1.1rem;
+  background: var(--nv-blue);
+  color: var(--nv-black);
+  font-weight: 700;
+  clip-path: polygon(0.55rem 0, 100% 0, 100% 100%, 0.55rem 100%, 0 50%);
+}
+
+.tmux :focus-visible {
+  outline: 2px solid var(--nv-orange);
+  outline-offset: -2px;
+}
+
+@media (max-width: 640px) {
+  .tmux {
+    font-size: 14px;
+  }
+
+  .statusRight,
+  .host {
+    display: none;
+  }
+}

@@ -1,7 +1,7 @@
 ---
 title: "Rebuilding my terminal as an IDE: tmux, zsh and Neovim"
 publishedAt: "2026-10-15"
-summary: "I turned an old packer-based Rust guide into a modular tmux, zsh and Neovim setup for Rust and C#, with one theme and one install script."
+summary: "I turned an old packer-based Rust guide into a modular tmux, zsh and Neovim setup for Rust and C#, managed with chezmoi and installed with one script."
 slug: "terminal-ide-tmux-zsh-neovim"
 ---
 
@@ -21,7 +21,8 @@ Some of the most useful parts were the small things that broke along the way, so
 2. **The shell is split into small files.** `~/.zshrc` is now just the zsh core. Everything else lives in `~/.config/env`, loaded at the right moment by zsh's startup files.
 3. **Neovim moved from packer to lazy.nvim.** Archived plugins were swapped for their successors, and every feature is its own file.
 4. **Rust and C# behave like they do in VS Code.** rust-analyzer and Roslyn give completion, code actions and inline errors. Debugging works with breakpoints, and existing `.vscode/tasks.json` and `launch.json` files are reused as they are.
-5. **One script installs it all:** `install-deps.sh`, for macOS (Homebrew), Fedora (dnf) and Ubuntu/WSL (apt).
+5. **One script installs it all:** `install-deps.sh`, for macOS (Homebrew), Fedora (dnf) and Ubuntu/WSL (apt). You can [download it here](/blog/assets/install-deps.sh).
+6. **chezmoi ties it together.** One repo holds every config file, asks each machine whether it wants Rust and C#, and runs the install script for you.
 
 ## The shell, in four files
 
@@ -73,6 +74,109 @@ Menus that are just "pick one", like code actions, have no search field: `j`/`k`
 - **Tree-sitter said "not in runtimepath" on the first start.** The folder didn't exist when Neovim started, and appeared during the session. A restart was the whole fix.
 - **The install script reported success on failed downloads.** `curl … | sh` exits 0 when curl fails. The script now downloads first and runs second.
 
+## Managing it all with chezmoi
+
+Configs spread across `~/.tmux.conf`, four zsh files, `~/.config/env` and `~/.config/nvim` are easy to break when you copy them by hand. I tried a plain dotfiles repo with symlinks before, and it never worked well across machines. chezmoi keeps a copy of each file in one git repo and writes real files into your home folder, with templates for the parts that differ per machine.
+
+### What goes in the repo, and what doesn't
+
+Configs go in. Anything a tool downloads stays out, because each machine fetches its own:
+
+| Path | In the repo? | Why |
+| --- | --- | --- |
+| `~/.zshenv`, `~/.zprofile`, `~/.zshrc`, `~/.zlogout` | yes | the shell startup chain |
+| `~/.config/env/` | yes | environment and the per-topic folders |
+| `~/.tmux.conf` | yes, as a template | the clipboard commands differ on macOS |
+| `~/.config/nvim/` | yes | including `lazy-lock.json`, which pins plugin versions |
+| `~/.config/oh-my-posh/`, `~/.config/yazi/` | yes | the prompt theme, the yazi theme and plugin list |
+| `~/.config/tmux/plugins/` | no | TPM downloads it |
+| `~/.config/yazi/flavors/` | no | `ya pkg` downloads it |
+| `~/.local/share/nvim/` | no | lazy.nvim and Mason download it |
+| `~/.oh-my-zsh/` | no | its installer clones it |
+
+### Two questions per machine
+
+`.chezmoi.toml.tmpl` in the repo root asks once per machine and remembers the answers:
+
+```toml
+{{- $rust   := promptBoolOnce . "rust"   "Rust support (rust-analyzer, codelldb)" true -}}
+{{- $csharp := promptBoolOnce . "csharp" "C# support (.NET SDK, Roslyn)" false -}}
+
+[data]
+  rust   = {{ $rust }}
+  csharp = {{ $csharp }}
+```
+
+`.chezmoiignore` uses the answers. This is where "one file per feature" pays off: turning Rust off means not installing one file.
+
+```text
+# Downloaded per machine, never in the repo
+.config/tmux/plugins
+.config/yazi/flavors
+.local/share/nvim
+
+# Files in the repo that aren't dotfiles
+README.md
+install-deps.sh
+
+# Languages, per machine
+{{ if not .rust }}
+.config/nvim/lua/plugins/rust.lua
+{{ end }}
+{{ if not .csharp }}
+.config/nvim/lua/plugins/csharp.lua
+{{ end }}
+```
+
+### One template for the clipboard
+
+tmux copies with `wl-copy` on Wayland Linux, but macOS has `pbcopy`. After `chezmoi chattr +template ~/.tmux.conf`, the clipboard section picks the right commands:
+
+```text
+{{- if eq .chezmoi.os "darwin" }}
+{{-   $copy := "pbcopy" }}{{ $copySel := "pbcopy" }}{{ $paste := "pbpaste" }}
+{{- else }}
+{{-   $copy := "wl-copy" }}{{ $copySel := "wl-copy -p" }}{{ $paste := "wl-paste -p -n" }}
+{{- end }}
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-no-clear "{{ $copySel }}"
+set -s copy-command "{{ $copy }}"
+```
+
+### The install script runs itself
+
+`install-deps.sh` sits in the repo root, ignored as a dotfile, and this script next to it runs it:
+
+```bash
+#!/usr/bin/env bash
+# run_onchange_after_install-deps.sh.tmpl
+# Runs after the first `chezmoi apply`, and again whenever install-deps.sh
+# changes (the hash below changes with it).
+# install-deps.sh hash: {{ include "install-deps.sh" | sha256sum }}
+exec bash {{ joinPath .chezmoi.sourceDir "install-deps.sh" | quote }} \
+  {{- if not .rust }} --no-rust{{ end }}
+  {{- if .csharp }} --csharp{{ end }}
+```
+
+`after` matters here: the dotfiles are in place before the script runs, so its Neovim step finds the config and installs the plugins and language servers.
+
+### A new machine is one command
+
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply <github-user>
+```
+
+That clones the repo, asks the two questions, writes the files, and runs the install script. What's left is three manual steps: `chsh -s "$(command -v zsh)"`, picking the Nerd Font in the terminal, and `C-a I` in tmux.
+
+### Day to day
+
+| I want to | Command |
+| --- | --- |
+| Change a config | `chezmoi edit --apply ~/.zshrc`, or edit in place and `chezmoi re-add` |
+| See what would change | `chezmoi diff` |
+| Get changes from another machine | `chezmoi update` |
+| Keep plugin updates | after `:Lazy update`: `chezmoi re-add ~/.config/nvim/lazy-lock.json` |
+| Change a machine's Rust/C# answer | `chezmoi init --prompt`, then `chezmoi apply` |
+
 ## One small principle
 
 Make each feature a file you can delete. The Rust support is one file, and turning it off on a machine means leaving that file out:
@@ -88,4 +192,10 @@ return {
 
 The same idea runs through the shell, where a new topic is a new numbered file in `~/.config/env`, and through tmux, which works fully without its plugins.
 
-Next up is putting tmux, zsh, `~/.config/env` and Neovim into one chezmoi repo, with a per-machine switch for Rust and C#.
+With chezmoi in place, a new machine goes from nothing to this whole setup with one command and three small manual steps.
+
+## Get the install script
+
+Download [install-deps.sh](/blog/assets/install-deps.sh). Run it with `--dry-run` first to see every command before anything is installed, and `--help` for the flags (`--csharp`, `--no-rust`, `--no-fonts`, `--no-nvim`). It's safe to re-run: anything already installed is skipped, failures are listed at the end, and the full output goes to `~/.cache/install-deps.log`.
+
+I've run the Ubuntu path end to end. The macOS and Fedora paths follow the same structure, but haven't had a full run yet.

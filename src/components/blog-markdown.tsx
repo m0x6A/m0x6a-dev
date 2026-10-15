@@ -24,6 +24,11 @@ function textOf(node: ReactNode): string {
     .join("");
 }
 
+function isStaticFile(href: string) {
+  const path = href.split(/[?#]/)[0];
+  return /\.[a-z0-9]+$/i.test(path.split("/").pop() ?? "");
+}
+
 const components: Components = {
   h2({ children, node: _node, ...props }) {
     return (
@@ -42,8 +47,24 @@ const components: Components = {
   a({ href = "", children, node: _node, ...props }) {
     const isExternal = href.startsWith("http");
 
+    const isRootRelative = href.startsWith("/") && !href.startsWith("//");
+
+    // Root-relative files (e.g. /blog/assets/install-deps.sh) aren't routes, so
+    // next/link can't handle them; add the basePath and let the browser download.
+    if (isRootRelative && isStaticFile(href)) {
+      return (
+        <a
+          href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${href}`}
+          className={styles.link}
+          download
+        >
+          {children}
+        </a>
+      );
+    }
+
     // Route root-relative links through next/link so they pick up the basePath.
-    if (href.startsWith("/") && !href.startsWith("//")) {
+    if (isRootRelative) {
       return (
         <Link href={href} className={styles.link}>
           {children}

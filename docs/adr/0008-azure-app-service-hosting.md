@@ -1,6 +1,6 @@
 # ADR-0008: Host on Azure App Service as a standalone Next.js server
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0010](0010-static-export-on-github-pages.md)
 - **Date:** 2026-03-06
 - **Related:** [ADR-0004](0004-server-side-blog-source-adapter.md), [ADR-0009](0009-split-hosting-static-web-apps-and-blog-function.md) (proposed replacement)
 

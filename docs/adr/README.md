@@ -23,5 +23,6 @@ Statuses: `Proposed` · `Accepted` · `Rejected` · `Deprecated` · `Superseded 
 | [0005](0005-markdown-front-matter-contract.md) | Minimal Markdown front matter contract, no MDX | Accepted |
 | [0006](0006-cli-styling-as-design-layer.md) | CLI styling as a design layer | Accepted |
 | [0007](0007-isolate-blog-failures.md) | Isolate blog failures behind explicit states | Accepted |
-| [0008](0008-azure-app-service-hosting.md) | Host on Azure App Service as a standalone Next.js server | Accepted |
-| [0009](0009-split-hosting-static-web-apps-and-blog-function.md) | Split hosting: Static Web Apps frontend + managed blog Function | Proposed |
+| [0008](0008-azure-app-service-hosting.md) | Host on Azure App Service as a standalone Next.js server | Superseded by 0010 |
+| [0009](0009-split-hosting-static-web-apps-and-blog-function.md) | Split hosting: Static Web Apps frontend + managed blog Function | Rejected |
+| [0010](0010-static-export-on-github-pages.md) | Static export hosted on GitHub Pages | Accepted |

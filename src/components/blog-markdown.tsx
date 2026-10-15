@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -6,6 +7,15 @@ import styles from "./blog-markdown.module.css";
 const components: Components = {
   a({ href = "", children, ...props }) {
     const isExternal = href.startsWith("http");
+
+    // Route root-relative links through next/link so they pick up the basePath.
+    if (href.startsWith("/") && !href.startsWith("//")) {
+      return (
+        <Link href={href} className={styles.link}>
+          {children}
+        </Link>
+      );
+    }
 
     return (
       <a

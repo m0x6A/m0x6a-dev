@@ -24,52 +24,32 @@ The application supports two source modes:
 
 Create `.env.local` from `.env.example` if you want to override the defaults.
 
-## Azure deployment
+## Deployment
 
-This repository now includes:
+The site is a static export (`output: "export"`) published to GitHub Pages by `.github/workflows/deploy-github-pages.yml`:
 
-- `infra/azure/main.bicep` for Azure App Service infrastructure
-- `.github/workflows/deploy-azure-webapp.yml` for GitHub Actions CI and deployment
-- `scripts/package-azure-webapp.mjs` to stage a standalone Next.js bundle for App Service
+- **Pull requests:** lint, test, and build.
+- **Pushes to `main`:** also deploy to Pages.
+- **Manual runs or a `blog-content-updated` repository dispatch:** rebuild and redeploy, e.g. after publishing a post in an external blog repo.
 
-### GitHub environment setup
+Blog posts are read at build time, so a new post goes live on the next deploy. When the blog lives in another repository, configure these under **Settings → Secrets and variables → Actions**:
 
-Create a GitHub environment (defaults to `production`) and add:
+- Variables: `BLOG_SOURCE_PROVIDER` (`local` or `github`), `BLOG_SOURCE_PATH`, `BLOG_SOURCE_OWNER`, `BLOG_SOURCE_REPO`, `BLOG_SOURCE_BRANCH`
+- Secret: `BLOG_SOURCE_TOKEN` if the blog repo is private
 
-**Secrets**
-
-- `AZURE_CLIENT_ID`
-- `AZURE_TENANT_ID`
-- `AZURE_SUBSCRIPTION_ID`
-- `BLOG_SOURCE_TOKEN` if the blog source repo is private
-
-**Variables**
-
-- `AZURE_RESOURCE_GROUP`
-- `AZURE_APP_NAME`
-- `AZURE_APP_SERVICE_PLAN_NAME` (optional, defaults to `<app-name>-plan`)
-- `AZURE_LOCATION` (optional, defaults to `swedencentral`)
-- `GITHUB_DEPLOYMENT_ENVIRONMENT` (optional, defaults to `production`)
-- `BLOG_SOURCE_PROVIDER` (`local` or `github`)
-- `BLOG_SOURCE_PATH`
-- `BLOG_SOURCE_OWNER` and `BLOG_SOURCE_REPO` when using `github`
-- `BLOG_SOURCE_BRANCH` (optional, defaults to `main`)
-
-### Manual infrastructure deployment
-
-Provision the Azure resources from a workstation that is already authenticated to Azure:
+To trigger a rebuild from the content repo:
 
 ```bash
-az deployment group create \
-  --resource-group <resource-group> \
-  --template-file infra/azure/main.bicep \
-  --parameters \
-    appName=<globally-unique-app-name> \
-    appServicePlanName=<app-service-plan-name> \
-    location=<azure-region>
+gh api repos/m0x6A/m0x6a-dev/dispatches -f event_type=blog-content-updated
 ```
 
-The GitHub Actions workflow handles linting, tests, `next build`, packaging, infrastructure reconciliation, and zip deployment on pushes to `main`.
+The Pages workflow sets `PAGES_BASE_PATH` (`/m0x6a-dev` for the project site, empty with a custom domain). To preview the export locally:
+
+```bash
+npm run build && npx serve out
+```
+
+See [ADR-0010](docs/adr/0010-static-export-on-github-pages.md) for the reasoning.
 
 ## Checks
 
@@ -77,7 +57,6 @@ The GitHub Actions workflow handles linting, tests, `next build`, packaging, inf
 npm run lint
 npm run test
 npm run build
-npm run package:azure
 ```
 
 ## Content contract

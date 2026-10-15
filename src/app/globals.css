@@ -141,6 +141,58 @@ select {
   content: "#### " / "";
 }
 
+/*
+ * Preview mode (blog posts), in the style of render-markdown.nvim: the #
+ * markers are concealed and headings get an icon and a coloured band.
+ */
+.nv-preview h1 {
+  padding-bottom: 0.2rem;
+  border-bottom: 2px solid rgba(122, 162, 247, 0.55);
+  background: none;
+}
+
+.nv-preview h1::before {
+  content: "◉ ";
+  content: "◉ " / "";
+  color: var(--nv-blue);
+}
+
+.nv-preview h2,
+.nv-preview h3,
+.nv-preview h4 {
+  padding: 0 1ch;
+}
+
+.nv-preview h2 {
+  background: rgba(224, 175, 104, 0.12);
+}
+
+.nv-preview h2::before {
+  content: "◆ ";
+  content: "◆ " / "";
+  color: var(--nv-yellow);
+}
+
+.nv-preview h3 {
+  background: rgba(158, 206, 106, 0.1);
+}
+
+.nv-preview h3::before {
+  content: "◇ ";
+  content: "◇ " / "";
+  color: var(--nv-green);
+}
+
+.nv-preview h4 {
+  background: rgba(115, 218, 202, 0.1);
+}
+
+.nv-preview h4::before {
+  content: "▸ ";
+  content: "▸ " / "";
+  color: var(--nv-green1);
+}
+
 @media (max-width: 640px) {
   .nv-lines > *::after {
     font-size: 14px;

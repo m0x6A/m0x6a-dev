@@ -62,12 +62,12 @@ export const portfolioContent: PortfolioContent = {
   identity: {
     name: "Mattias Jonsson",
     alias: "m0x6a",
-    role: "Systems developer and architect, Sogeti Sverige AB",
+    role: "Systems developer and architect, IT consultant",
     focus: "Observability, quality systems, agentic work and digital sovereignty",
     location: "Remote-first / Sweden",
     availability: "Open to talks and enablement on agentic coding",
     summary:
-      "I build .NET and TypeScript systems and the platforms around them. Right now I'm building an observability platform at the Swedish Transport Administration, and helping development teams adopt GitHub Copilot and agentic coding.",
+      "I build .NET and TypeScript systems and the platforms around them. Right now I'm building an observability platform for a Swedish government agency, and helping development teams adopt GitHub Copilot and agentic coding.",
     highlights: [
       "Three enablement assignments on GitHub Copilot and agentic coding",
       "Talks on GitHub Copilot and spec-driven development",
@@ -77,23 +77,23 @@ export const portfolioContent: PortfolioContent = {
   background: {
     title: "Experience",
     summary:
-      "Developer and architect roles through Sogeti since 2021, after two years building and maintaining .NET systems at Empori Systems.",
+      "Developer and architect roles as a consultant since 2021, after two years building and maintaining .NET systems at a software company.",
     entries: [
       {
         period: "2025–",
-        title: "Platform developer, Swedish Transport Administration",
+        title: "Platform developer, government agency",
         description:
           "Part of a team establishing a new observability capability at a government agency, evaluating tools such as Splunk and the Grafana LGTM stack to build a modern, robust observability platform.",
       },
       {
         period: "2025–",
-        title: "AI and agentic coding enablement, Sogeti",
+        title: "AI and agentic coding enablement, development teams",
         description:
           "Three enablement assignments helping development teams adopt GitHub Copilot and agentic coding, including spec-driven development, plus several talks on Copilot and spec-driven development.",
       },
       {
         period: "2023–2025",
-        title: "Systems developer and architect, Swedish Transport Administration",
+        title: "Systems developer and architect, government agency",
         description:
           "Restarted a paused microservices project (.NET and Angular) for communication between systems and users, owning its architecture, modernisation and DevOps setup.",
       },
@@ -111,7 +111,7 @@ export const portfolioContent: PortfolioContent = {
       },
       {
         period: "2019–2021",
-        title: "Systems developer, Empori Systems",
+        title: "Systems developer, software company",
         description:
           "Maintenance, legacy integration and new development in C# and .NET, with customer contact, sprint planning and support.",
       },

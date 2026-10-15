@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { countLines, extractHeadings, slugifyHeading } from "../src/lib/blog/headings";
+import {
+  countLines,
+  extractHeadings,
+  readingMinutes,
+  slugifyHeading,
+} from "../src/lib/blog/headings";
 
 test("slugifyHeading builds stable anchor ids", () => {
   assert.equal(slugifyHeading("Neovim: what replaced what"), "neovim-what-replaced-what");
@@ -29,4 +34,12 @@ test("extractHeadings returns h2 and h3 outside code fences", () => {
 test("countLines counts Markdown source lines", () => {
   assert.equal(countLines(""), 0);
   assert.equal(countLines("one\ntwo"), 2);
+});
+
+test("readingMinutes skips code blocks and rounds to at least one minute", () => {
+  const prose = Array.from({ length: 440 }, () => "word").join(" ");
+  const code = ["```sh", ...Array.from({ length: 500 }, () => "echo ok"), "```"].join("\n");
+
+  assert.equal(readingMinutes(`${prose}\n${code}`), 2);
+  assert.equal(readingMinutes("short"), 1);
 });

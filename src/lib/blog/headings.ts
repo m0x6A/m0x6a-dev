@@ -39,6 +39,17 @@ export function extractHeadings(markdown: string): BlogHeading[] {
   return headings;
 }
 
+const WORDS_PER_MINUTE = 220;
+
+export function readingMinutes(markdown: string) {
+  const words = markdown
+    .replace(/```[\s\S]*?```/g, " ")
+    .split(/\s+/)
+    .filter((word) => /[\p{L}\p{N}]/u.test(word)).length;
+
+  return Math.max(1, Math.round(words / WORDS_PER_MINUTE));
+}
+
 export function countLines(markdown: string) {
   return markdown.length === 0 ? 0 : markdown.split("\n").length;
 }

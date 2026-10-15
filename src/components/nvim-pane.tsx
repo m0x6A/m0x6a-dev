@@ -14,7 +14,7 @@ type NvimPaneProps = {
   fileName: string;
   fileType: string;
   message: ReactNode;
-  tone?: "default" | "error";
+  tone?: "default" | "error" | "preview";
   children: ReactNode;
 };
 
@@ -53,8 +53,8 @@ export function NvimPane({
       </div>
 
       <div className={styles.statusline} aria-hidden="true">
-        <span className={`${styles.mode} ${tone === "error" ? styles.errorMode : ""}`}>
-          {tone === "error" ? "ERROR" : "NORMAL"}
+        <span className={`${styles.mode} ${tone === "default" ? "" : styles[`${tone}Mode`]}`}>
+          {tone === "default" ? "NORMAL" : tone.toUpperCase()}
         </span>
         <span className={styles.branch}>⎇ main</span>
         <span className={styles.fileName}>

@@ -9,7 +9,7 @@ import {
   TableOfContents,
 } from "@/components/nvim-pane";
 import { TmuxShell } from "@/components/tmux-shell";
-import { countLines, extractHeadings } from "@/lib/blog/headings";
+import { countLines, extractHeadings, readingMinutes } from "@/lib/blog/headings";
 import { getBlogIndex, getBlogPost } from "@/lib/blog/posts";
 import styles from "../blog.module.css";
 
@@ -105,31 +105,18 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         buffers={buffers}
         fileName={fileName}
         fileType="markdown"
-        message={`"${fileName}" [readonly] ${countLines(post.content)}L`}
+        tone="preview"
+        message={`"${fileName}" [preview] ${countLines(post.content)}L`}
       >
-        <article className={styles.article}>
-          <header className={`nv-lines ${styles.frontmatter}`}>
-            <p className={styles.fence} aria-hidden="true">
-              ---
-            </p>
-            <p>
-              <span className={styles.yamlKey}>publishedAt:</span>{" "}
-              <time dateTime={post.publishedAt} className={styles.yamlValue}>
-                {post.publishedAt}
-              </time>
-            </p>
-            <p>
-              <span className={styles.yamlKey}>summary:</span>{" "}
-              <span className={styles.yamlString}>&quot;{post.summary}&quot;</span>
-            </p>
-            <p>
-              <span className={styles.yamlKey}>source:</span>{" "}
-              <span className={styles.yamlValue}>{result.sourceLabel}</span>
-            </p>
-            <p className={styles.fence} aria-hidden="true">
-              ---
-            </p>
+        <article className={`nv-preview ${styles.article}`}>
+          <header className={`nv-lines ${styles.postHeader}`}>
             <h1>{post.title}</h1>
+            <p className={styles.postMeta}>
+              <time dateTime={post.publishedAt}>{post.publishedAt}</time>
+              <span aria-hidden="true">·</span>
+              <span>{readingMinutes(post.content)} min read</span>
+            </p>
+            <p className={styles.postSummary}>{post.summary}</p>
           </header>
           <BlogMarkdown content={post.content} />
         </article>

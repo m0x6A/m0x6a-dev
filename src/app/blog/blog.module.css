@@ -71,28 +71,22 @@
   gap: 1rem;
 }
 
-:global(.nv-lines).frontmatter {
-  gap: 0;
+:global(.nv-lines).postHeader {
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
 }
 
-:global(.nv-lines).frontmatter h1 {
-  margin-top: 1rem;
+.postMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1ch;
+  color: var(--nv-muted);
 }
 
-.fence {
-  color: var(--nv-comment);
-}
-
-.yamlKey {
-  color: var(--nv-blue1);
-}
-
-.yamlValue {
-  color: var(--nv-orange);
-}
-
-.yamlString {
-  color: var(--nv-green);
+.postSummary {
+  margin-top: 0.4rem;
+  color: var(--nv-fg-dark);
+  font-style: italic;
 }
 
 @media (prefers-reduced-motion: reduce) {

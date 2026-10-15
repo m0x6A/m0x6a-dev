@@ -1,6 +1,6 @@
 # ADR-0006: CLI styling as a design layer
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0011](0011-tmux-neovim-site-interface.md)
 - **Date:** 2026-03-06
 - **Related:** [Developer portfolio](../requirements/developer-portfolio.md)
 

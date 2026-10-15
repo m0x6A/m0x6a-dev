@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BlogMarkdown } from "@/components/blog-markdown";
-import { SiteShell } from "@/components/site-shell";
-import { StatePanel } from "@/components/state-panel";
+import {
+  BufferNotice,
+  KeyHints,
+  NvimPane,
+  ShellPane,
+  TableOfContents,
+} from "@/components/nvim-pane";
+import { TmuxShell } from "@/components/tmux-shell";
+import { countLines, extractHeadings } from "@/lib/blog/headings";
 import { getBlogIndex, getBlogPost } from "@/lib/blog/posts";
 import styles from "../blog.module.css";
 
@@ -50,38 +57,88 @@ export async function generateMetadata({
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const result = await getBlogPost(slug);
+  const [result, index] = await Promise.all([getBlogPost(slug), getBlogIndex()]);
 
   if (result.status === "not_found") {
     notFound();
   }
 
+  const fileName = `${slug}.md`;
+  const buffers = [
+    { label: "posts/", href: "/blog" },
+    ...(index.status === "ready" ? index.posts : []).map((post) => ({
+      label: `${post.slug}.md`,
+      href: post.route,
+      active: post.slug === slug,
+    })),
+  ];
+
+  if (result.status === "unavailable") {
+    return (
+      <TmuxShell activeWindow="blog" statusRight={result.sourceLabel}>
+        <NvimPane
+          buffers={buffers}
+          fileName={fileName}
+          fileType="markdown"
+          tone="error"
+          message={`E484: Can't open file ${fileName}`}
+        >
+          <BufferNotice
+            title="Post unavailable"
+            description={result.message}
+            actions={[
+              { href: "/blog", label: "Back to blog", command: ":e posts/" },
+              { href: "/", label: "Return home", command: ":q" },
+            ]}
+          />
+        </NvimPane>
+      </TmuxShell>
+    );
+  }
+
+  const { post } = result;
+  const headings = extractHeadings(post.content);
+
   return (
-    <SiteShell activeRoute="blog">
-      {result.status === "unavailable" ? (
-        <StatePanel
-          title="Post unavailable"
-          description={result.message}
-          actions={[
-            { href: "/blog", label: "Back to blog" },
-            { href: "/", label: "Return home" },
-          ]}
-          tone="danger"
-        />
-      ) : (
-        <article className={`surface ${styles.article}`}>
-          <header className={styles.articleHeader}>
-            <p className="eyebrow">cat ./{result.post.slug}.md</p>
-            <h1 className={styles.articleTitle}>{result.post.title}</h1>
-            <div className={styles.articleMeta}>
-              <span>{result.post.publishedLabel}</span>
-              <span>{result.sourceLabel}</span>
-            </div>
-            <p className={styles.articleSummary}>{result.post.summary}</p>
+    <TmuxShell activeWindow="blog" statusRight={`${fileName} · ${post.publishedLabel}`}>
+      <NvimPane
+        buffers={buffers}
+        fileName={fileName}
+        fileType="markdown"
+        message={`"${fileName}" [readonly] ${countLines(post.content)}L`}
+      >
+        <article className={styles.article}>
+          <header className={`nv-lines ${styles.frontmatter}`}>
+            <p className={styles.fence} aria-hidden="true">
+              ---
+            </p>
+            <p>
+              <span className={styles.yamlKey}>publishedAt:</span>{" "}
+              <time dateTime={post.publishedAt} className={styles.yamlValue}>
+                {post.publishedAt}
+              </time>
+            </p>
+            <p>
+              <span className={styles.yamlKey}>summary:</span>{" "}
+              <span className={styles.yamlString}>&quot;{post.summary}&quot;</span>
+            </p>
+            <p>
+              <span className={styles.yamlKey}>source:</span>{" "}
+              <span className={styles.yamlValue}>{result.sourceLabel}</span>
+            </p>
+            <p className={styles.fence} aria-hidden="true">
+              ---
+            </p>
+            <h1>{post.title}</h1>
           </header>
-          <BlogMarkdown content={result.post.content} />
+          <BlogMarkdown content={post.content} />
         </article>
-      )}
-    </SiteShell>
+      </NvimPane>
+
+      <ShellPane label="Table of contents">
+        <TableOfContents fileName={fileName} headings={headings} />
+        <KeyHints />
+      </ShellPane>
+    </TmuxShell>
   );
 }

@@ -1,41 +1,21 @@
 :root {
-  --background: #061018;
-  --background-elevated: rgba(12, 24, 36, 0.92);
-  --surface: rgba(10, 20, 31, 0.88);
-  --surface-strong: rgba(14, 27, 39, 0.98);
-  --foreground: #ecfff8;
-  --muted: #9cbab1;
-  --accent: #5cf1c4;
-  --accent-strong: #8ef36f;
-  --border: rgba(92, 241, 196, 0.16);
-  --border-strong: rgba(92, 241, 196, 0.3);
-  --danger: #ff8474;
-  --shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
-  --font-sans:
-    Inter, "SF Pro Display", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
-    sans-serif;
   --font-mono:
-    "JetBrains Mono", "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono",
-    Menlo, monospace;
+    var(--font-jetbrains-mono), "JetBrains Mono", "SFMono-Regular", "SF Mono", Consolas,
+    "Liberation Mono", Menlo, monospace;
 }
 
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  scroll-behavior: smooth;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: var(--font-sans);
+  background: #1a1b26;
+  color: #c0caf5;
+  font-family: var(--font-mono);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image:
-    radial-gradient(circle at top right, rgba(92, 241, 196, 0.12), transparent 28%),
-    radial-gradient(circle at bottom left, rgba(142, 243, 111, 0.12), transparent 26%),
-    linear-gradient(180deg, rgba(5, 12, 20, 0.92), rgba(4, 10, 16, 1));
 }
 
 * {
@@ -70,99 +50,99 @@ select {
   font: inherit;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
+/*
+ * Neovim buffer lines, used inside the tmux shell. Every direct child of
+ * .nv-lines is one numbered "line"; the counter is reset by the buffer.
+ */
+.nv-lines {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.nv-lines > * {
+  position: relative;
+  counter-increment: line;
+}
+
+.nv-lines > *::after {
+  content: counter(line);
+  content: counter(line) / "";
+  position: absolute;
+  top: 0;
+  left: calc(-1 * var(--gutter, 6ch) - 0.5rem);
+  width: var(--gutter, 6ch);
+  color: var(--nv-line-nr);
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.75;
+  text-align: right;
   pointer-events: none;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.02) 0,
-      rgba(255, 255, 255, 0.02) 1px,
-      transparent 1px,
-      transparent 4px
-    );
-  opacity: 0.18;
 }
 
-.surface {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(18px);
-}
-
-.button,
-.buttonSecondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  min-height: 48px;
-  padding: 0.8rem 1.2rem;
-  border-radius: 14px;
-  border: 1px solid var(--border);
+.nv-lines > *:hover::after {
+  color: var(--nv-orange);
   font-weight: 700;
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background-color 180ms ease;
 }
 
-.button {
-  background: linear-gradient(
-    180deg,
-    rgba(92, 241, 196, 0.22),
-    rgba(92, 241, 196, 0.12)
-  );
-  border-color: var(--border-strong);
+.nv-lines h1,
+.nv-lines h2,
+.nv-lines h3,
+.nv-lines h4 {
+  font-size: inherit;
+  line-height: 1.75;
+  scroll-margin-top: 1rem;
 }
 
-.buttonSecondary {
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--muted);
+.nv-lines h1::before,
+.nv-lines h2::before,
+.nv-lines h3::before,
+.nv-lines h4::before {
+  color: var(--nv-comment);
+  font-weight: 400;
 }
 
-.button:hover,
-.buttonSecondary:hover,
-a:hover {
-  border-color: var(--accent);
+.nv-lines h1 {
+  background: rgba(122, 162, 247, 0.12);
+  color: var(--nv-blue);
 }
 
-.button:hover,
-.buttonSecondary:hover {
-  transform: translateY(-1px);
+.nv-lines h1::before {
+  content: "# ";
+  content: "# " / "";
 }
 
-.mono {
-  font-family: var(--font-mono);
+.nv-lines h2 {
+  margin-top: 1rem;
+  color: var(--nv-yellow);
 }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  color: var(--accent);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.nv-lines h2::before {
+  content: "## ";
+  content: "## " / "";
 }
 
-.eyebrow::before {
-  content: ">";
-  color: var(--accent-strong);
+.nv-lines h3 {
+  color: var(--nv-green);
 }
 
-@media (max-width: 720px) {
-  .button,
-  .buttonSecondary {
-    width: 100%;
+.nv-lines h3::before {
+  content: "### ";
+  content: "### " / "";
+}
+
+.nv-lines h4 {
+  color: var(--nv-green1);
+}
+
+.nv-lines h4::before {
+  content: "#### ";
+  content: "#### " / "";
+}
+
+@media (max-width: 640px) {
+  .nv-lines > *::after {
+    font-size: 14px;
   }
 }

@@ -15,7 +15,7 @@ function isTyping(target: EventTarget | null) {
   );
 }
 
-/** j/k scroll, gg/G jump, H/L switch to the previous/next buffer tab. */
+/** j/k scroll, gg/G jump, H/L switch buffer tabs, p toggles the post preview. */
 export function VimMotions() {
   useEffect(() => {
     let pendingG = false;
@@ -77,6 +77,16 @@ export function VimMotions() {
         case "L":
           switchBuffer(1);
           break;
+        case "p": {
+          const toggle = document.querySelector<HTMLButtonElement>("[data-view-toggle]");
+
+          if (!toggle) {
+            return;
+          }
+
+          toggle.click();
+          break;
+        }
         default:
           return;
       }

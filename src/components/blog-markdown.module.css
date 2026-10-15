@@ -21,6 +21,11 @@
   padding-left: 2ch;
 }
 
+/* "10." is wider than a bullet; keep it clear of the line number. */
+.content ol {
+  padding-left: 4ch;
+}
+
 .content ul {
   list-style: "● ";
 }
@@ -86,6 +91,14 @@
   margin: -0.2rem -0.25ch 0 2ch;
   color: var(--nv-muted);
   font-size: 0.8rem;
+}
+
+/* Preview mode puts the language above the code, like render-markdown.nvim. */
+:global(:root:not([data-view="source"]) .nv-preview) .pre[data-language]::before {
+  display: block;
+  float: none;
+  margin: -0.2rem 0 0.5rem;
+  color: var(--nv-blue1);
 }
 
 .pre code {

@@ -13,9 +13,16 @@
 }
 
 /* Bufferline */
-.tabline {
+.tabbar {
   display: flex;
   flex-shrink: 0;
+  background: var(--nv-bg-dark);
+}
+
+.tabline {
+  display: flex;
+  flex: 1;
+  min-width: 0;
   overflow-x: auto;
   background: var(--nv-bg-dark);
   font-size: 0.85rem;
@@ -32,6 +39,30 @@
 
 .tab:hover {
   color: var(--nv-fg);
+}
+
+.tabActions {
+  display: flex;
+  flex-shrink: 0;
+  border-left: 1px solid var(--nv-black);
+}
+
+.tabActions button {
+  padding: 0 1rem;
+  border: 0;
+  background: none;
+  color: var(--nv-magenta);
+  font-size: 0.85rem;
+  line-height: 1.9rem;
+  cursor: pointer;
+}
+
+.tabActions button[aria-pressed="false"] {
+  color: var(--nv-blue);
+}
+
+.tabActions button:hover {
+  background: var(--nv-bg-highlight);
 }
 
 .activeTab {
@@ -109,6 +140,10 @@
 
 .errorMode {
   background: var(--nv-red);
+}
+
+.previewMode {
+  background: var(--nv-magenta);
 }
 
 .branch {

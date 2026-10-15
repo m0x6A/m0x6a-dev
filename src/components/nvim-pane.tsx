@@ -14,7 +14,9 @@ type NvimPaneProps = {
   fileName: string;
   fileType: string;
   message: ReactNode;
-  tone?: "default" | "error";
+  tone?: "default" | "error" | "preview";
+  /** Controls shown at the right end of the bufferline. */
+  actions?: ReactNode;
   children: ReactNode;
 };
 
@@ -25,6 +27,7 @@ export function NvimPane({
   fileType,
   message,
   tone = "default",
+  actions,
   children,
 }: NvimPaneProps) {
   return (
@@ -33,19 +36,22 @@ export function NvimPane({
       className={`${styles.pane} ${styles.focused}`}
       aria-label={`Editor: ${fileName}`}
     >
-      <nav className={styles.tabline} aria-label="Posts">
-        {buffers.map((buffer) => (
-          <Link
-            key={buffer.href}
-            href={buffer.href}
-            className={`${styles.tab} ${buffer.active ? styles.activeTab : ""}`}
-            aria-current={buffer.active ? "page" : undefined}
-            data-buffer=""
-          >
-            {buffer.label}
-          </Link>
-        ))}
-      </nav>
+      <div className={styles.tabbar}>
+        <nav className={styles.tabline} aria-label="Posts">
+          {buffers.map((buffer) => (
+            <Link
+              key={buffer.href}
+              href={buffer.href}
+              className={`${styles.tab} ${buffer.active ? styles.activeTab : ""}`}
+              aria-current={buffer.active ? "page" : undefined}
+              data-buffer=""
+            >
+              {buffer.label}
+            </Link>
+          ))}
+        </nav>
+        {actions ? <div className={styles.tabActions}>{actions}</div> : null}
+      </div>
 
       <div id="buffer" className={styles.buffer} tabIndex={0}>
         <div className={styles.text}>{children}</div>
@@ -53,9 +59,16 @@ export function NvimPane({
       </div>
 
       <div className={styles.statusline} aria-hidden="true">
-        <span className={`${styles.mode} ${tone === "error" ? styles.errorMode : ""}`}>
-          {tone === "error" ? "ERROR" : "NORMAL"}
-        </span>
+        {tone === "preview" ? (
+          <>
+            <span className={`${styles.mode} ${styles.previewMode} preview-only`}>PREVIEW</span>
+            <span className={`${styles.mode} source-only`}>NORMAL</span>
+          </>
+        ) : (
+          <span className={`${styles.mode} ${tone === "error" ? styles.errorMode : ""}`}>
+            {tone === "error" ? "ERROR" : "NORMAL"}
+          </span>
+        )}
         <span className={styles.branch}>⎇ main</span>
         <span className={styles.fileName}>
           {fileName} <span className={styles.readonly}>[RO]</span>
@@ -138,11 +151,16 @@ const keys = [
   { label: "H / L", value: "previous / next buffer" },
 ];
 
-export function KeyHints({ cwd }: { cwd?: string }) {
+type KeyHintsProps = {
+  cwd?: string;
+  extra?: OutputRow[];
+};
+
+export function KeyHints({ cwd, extra = [] }: KeyHintsProps) {
   return (
     <>
       <Prompt cwd={cwd} command="cat keys.txt" />
-      <ShellOutput rows={keys} />
+      <ShellOutput rows={[...keys, ...extra]} />
     </>
   );
 }

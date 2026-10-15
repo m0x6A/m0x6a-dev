@@ -71,6 +71,11 @@
   gap: 1rem;
 }
 
+:global(.nv-lines).postHeader {
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
 :global(.nv-lines).frontmatter {
   gap: 0;
 }
@@ -93,6 +98,19 @@
 
 .yamlString {
   color: var(--nv-green);
+}
+
+.postMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1ch;
+  color: var(--nv-muted);
+}
+
+.postSummary {
+  margin-top: 0.4rem;
+  color: var(--nv-fg-dark);
+  font-style: italic;
 }
 
 @media (prefers-reduced-motion: reduce) {

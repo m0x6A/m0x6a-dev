@@ -111,6 +111,10 @@
   background: var(--nv-red);
 }
 
+.previewMode {
+  background: var(--nv-magenta);
+}
+
 .branch {
   margin-left: -0.3rem;
   padding-left: 1rem;

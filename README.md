@@ -2,6 +2,10 @@
 
 CLI-inspired portfolio and Git-backed blog for Mattias Jonsson (`m0x6a`), built with Next.js App Router.
 
+## Documentation
+
+Architecture, requirements, and Architecture Decision Records (ADRs) live in [`docs/`](docs/README.md). Record significant decisions as a new ADR in [`docs/adr/`](docs/adr/README.md).
+
 ## Development
 
 ```bash

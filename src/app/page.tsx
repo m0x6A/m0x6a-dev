@@ -14,10 +14,11 @@ import styles from "./page.module.css";
 const fileName = "README.md";
 
 export default function Home() {
-  const { identity, background, skills, selectedWork, contact } = portfolioContent;
+  const { identity, background, interests, skills, selectedWork, contact } = portfolioContent;
   const [primaryContact] = contact.actions;
   const sections = [
-    { id: "background", text: background.title, depth: 2 as const },
+    { id: "experience", text: background.title, depth: 2 as const },
+    { id: "interests", text: interests.title, depth: 2 as const },
     { id: "skills", text: skills.title, depth: 2 as const },
     { id: "work", text: selectedWork.title, depth: 2 as const },
     { id: "contact", text: contact.title, depth: 2 as const },
@@ -74,14 +75,25 @@ export default function Home() {
           </p>
         </header>
 
-        <section id="background" className="nv-lines" aria-labelledby="background-title">
-          <h2 id="background-title">{background.title}</h2>
+        <section id="experience" className="nv-lines" aria-labelledby="experience-title">
+          <h2 id="experience-title">{background.title}</h2>
           <p className={styles.lede}>{background.summary}</p>
           {background.entries.map((entry) => (
             <article key={entry.title} className={styles.entry}>
               <p className={styles.period}>[{entry.period}]</p>
               <h3>{entry.title}</h3>
               <p className={styles.body}>{entry.description}</p>
+            </article>
+          ))}
+        </section>
+
+        <section id="interests" className="nv-lines" aria-labelledby="interests-title">
+          <h2 id="interests-title">{interests.title}</h2>
+          <p className={styles.lede}>{interests.summary}</p>
+          {interests.items.map((item) => (
+            <article key={item.name} className={styles.entry}>
+              <h3>{item.name}</h3>
+              <p className={styles.body}>{item.detail}</p>
             </article>
           ))}
         </section>
@@ -110,7 +122,19 @@ export default function Home() {
           {selectedWork.entries.map((entry) => (
             <article key={entry.name} className={styles.entry}>
               <h3>
-                {entry.name} <span className={styles.impact}>-- {entry.impact}</span>
+                {entry.href ? (
+                  <a
+                    className={styles.link}
+                    href={entry.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {entry.name}
+                  </a>
+                ) : (
+                  entry.name
+                )}{" "}
+                <span className={styles.impact}>-- {entry.impact}</span>
               </h3>
               <p className={styles.body}>{entry.summary}</p>
               <ul className={styles.chips}>

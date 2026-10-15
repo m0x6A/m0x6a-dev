@@ -1,6 +1,6 @@
 # ADR-0004: Server-side blog source adapter
 
-- **Status:** Accepted
+- **Status:** Accepted, amended by [ADR-0010](0010-static-export-on-github-pages.md) (content is resolved at build time)
 - **Date:** 2026-03-06
 - **Related:** [Git-backed blog](../requirements/git-backed-blog.md), [ADR-0009](0009-split-hosting-static-web-apps-and-blog-function.md) (proposes moving this behind an API)
 

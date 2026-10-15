@@ -1,4 +1,4 @@
-# ADR-0010: tmux and Neovim interface for the site
+# ADR-0011: tmux and Neovim interface for the site
 
 - **Status:** Accepted
 - **Date:** 2026-10-15

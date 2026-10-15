@@ -1,6 +1,6 @@
 # Architecture overview
 
-The m0x6a site is a single Next.js 16 App Router application (React 19, TypeScript). It serves a portfolio styled as tmux running Neovim and a Markdown blog loaded from a configurable Git source. It is deployed to Azure App Service as a standalone Node server.
+The m0x6a site is a single Next.js 16 App Router application (React 19, TypeScript). It serves a portfolio styled as tmux running Neovim and a Markdown blog loaded from a configurable Git source. It is built as a static export and hosted on GitHub Pages, so all content, including blog posts, is resolved at build time.
 
 ## Components
 
@@ -8,8 +8,8 @@ The m0x6a site is a single Next.js 16 App Router application (React 19, TypeScri
 src/
 ├── app/
 │   ├── page.tsx               /             portfolio homepage
-│   ├── blog/page.tsx          /blog         blog index      (revalidate 300s)
-│   ├── blog/[slug]/page.tsx   /blog/:slug   blog post       (revalidate 300s)
+│   ├── blog/page.tsx          /blog         blog index
+│   ├── blog/[slug]/page.tsx   /blog/:slug   blog post       (generateStaticParams)
 │   ├── layout.tsx, globals.css               root layout + design tokens
 │   └── not-found.tsx
 ├── components/
@@ -32,7 +32,7 @@ src/
 ## Blog data flow
 
 ```
-page.tsx ──► getBlogIndex() / getBlogPost(slug)        (posts.ts, React cache per request)
+page.tsx ──► getBlogIndex() / getBlogPost(slug)        (posts.ts, runs at build time)
                │
                ├─ getBlogSourceConfig()                (source.ts, env vars)
                ├─ createBlogSourceAdapter()            local | github
@@ -60,12 +60,12 @@ See [ADR-0004](../adr/0004-server-side-blog-source-adapter.md) and [ADR-0007](..
 
 ## Deployment
 
-See [ADR-0008](../adr/0008-azure-app-service-hosting.md). In short:
+See [ADR-0010](../adr/0010-static-export-on-github-pages.md). In short:
 
-- `infra/azure/main.bicep` provisions the App Service.
-- `.github/workflows/deploy-azure-webapp.yml` runs lint, test, build, `package:azure` and zip deploy on pushes to `main`.
-
-A move to Static Web Apps plus a managed blog Function is proposed in [ADR-0009](../adr/0009-split-hosting-static-web-apps-and-blog-function.md).
+- `next.config.ts` sets `output: "export"`, `trailingSlash: true` and `basePath` from `PAGES_BASE_PATH`.
+- `.github/workflows/deploy-github-pages.yml` lints, tests, builds `out/` and deploys it with `actions/deploy-pages`. It runs on pushes to `main`, manual dispatch and the `blog-content-updated` repository dispatch. Pull requests run validation only.
+- Blog source variables are GitHub Actions repository variables. `BLOG_SOURCE_TOKEN` is an Actions secret used only during the build.
+- `/blog/[slug]` pre-renders one page per post (`dynamicParams = false`). Unknown slugs get the exported `404.html`. If the source is empty or unavailable, a placeholder `/blog/_/` page is rendered, because the export can't have zero params.
 
 ## Testing
 

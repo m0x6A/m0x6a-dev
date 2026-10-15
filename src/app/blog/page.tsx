@@ -17,8 +17,6 @@ export const metadata: Metadata = {
   description: "Git-backed notes and build logs from m0x6a.",
 };
 
-export const revalidate = 300;
-
 export default async function BlogPage() {
   const result = await getBlogIndex();
   const posts = result.status === "ready" ? result.posts : [];

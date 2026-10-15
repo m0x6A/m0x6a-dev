@@ -19,7 +19,23 @@ type BlogPostPageProps = {
   }>;
 };
 
-export const revalidate = 300;
+// Static export: every post is rendered at build time and unknown slugs fall
+// through to the host's 404 page.
+export const dynamicParams = false;
+
+// `output: "export"` rejects an empty param list, so an empty or unavailable
+// source still renders one placeholder route that resolves to not-found.
+const PLACEHOLDER_SLUG = "_";
+
+export async function generateStaticParams() {
+  const result = await getBlogIndex();
+
+  if (result.status !== "ready") {
+    return [{ slug: PLACEHOLDER_SLUG }];
+  }
+
+  return result.posts.map((post) => ({ slug: post.slug }));
+}
 
 export async function generateMetadata({
   params,

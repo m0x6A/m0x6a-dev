@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
 const LINE_STEP = 72;
 
@@ -18,8 +17,6 @@ function isTyping(target: EventTarget | null) {
 
 /** j/k scroll, gg/G jump, H/L switch to the previous/next buffer tab. */
 export function VimMotions() {
-  const router = useRouter();
-
   useEffect(() => {
     let pendingG = false;
     let pendingTimer: number | undefined;
@@ -29,8 +26,9 @@ export function VimMotions() {
       const current = tabs.findIndex((tab) => tab.getAttribute("aria-current") === "page");
       const next = tabs[current + offset];
 
+      // Clicking the tab lets next/link handle the basePath.
       if (current !== -1 && next) {
-        router.push(next.pathname);
+        next.click();
       }
     }
 
@@ -92,7 +90,7 @@ export function VimMotions() {
       window.removeEventListener("keydown", onKeyDown);
       window.clearTimeout(pendingTimer);
     };
-  }, [router]);
+  }, []);
 
   return null;
 }

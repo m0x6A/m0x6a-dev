@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- react-markdown passes a hast `node` prop that must not reach the DOM. */
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { Children, isValidElement } from "react";
 import type { Components } from "react-markdown";
@@ -40,6 +41,15 @@ const components: Components = {
   },
   a({ href = "", children, node: _node, ...props }) {
     const isExternal = href.startsWith("http");
+
+    // Route root-relative links through next/link so they pick up the basePath.
+    if (href.startsWith("/") && !href.startsWith("//")) {
+      return (
+        <Link href={href} className={styles.link}>
+          {children}
+        </Link>
+      );
+    }
 
     return (
       <a

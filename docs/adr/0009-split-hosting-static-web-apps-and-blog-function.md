@@ -1,6 +1,6 @@
 # ADR-0009: Split hosting: Static Web Apps frontend + managed blog Function
 
-- **Status:** Proposed
+- **Status:** Rejected in favour of [ADR-0010](0010-static-export-on-github-pages.md)
 - **Date:** 2026-03-06
 - **Related:** would supersede [ADR-0008](0008-azure-app-service-hosting.md) and amend [ADR-0004](0004-server-side-blog-source-adapter.md); must preserve [ADR-0007](0007-isolate-blog-failures.md)
 

@@ -1,0 +1,87 @@
+name: deploy-github-pages
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  # Lets an external blog content repository trigger a rebuild after publishing.
+  repository_dispatch:
+    types:
+      - blog-content-updated
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-github-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  build:
+    name: Validate and build
+    runs-on: ubuntu-latest
+    env:
+      BLOG_SOURCE_PROVIDER: ${{ vars.BLOG_SOURCE_PROVIDER || 'local' }}
+      BLOG_SOURCE_PATH: ${{ vars.BLOG_SOURCE_PATH || 'content/blog' }}
+      BLOG_SOURCE_OWNER: ${{ vars.BLOG_SOURCE_OWNER }}
+      BLOG_SOURCE_REPO: ${{ vars.BLOG_SOURCE_REPO }}
+      BLOG_SOURCE_BRANCH: ${{ vars.BLOG_SOURCE_BRANCH || 'main' }}
+      BLOG_SOURCE_TOKEN: ${{ secrets.BLOG_SOURCE_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: npm
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - id: pages
+        name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build static site
+        run: npm run build
+        env:
+          PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - id: deploy
+        name: Deploy
+        uses: actions/deploy-pages@v4

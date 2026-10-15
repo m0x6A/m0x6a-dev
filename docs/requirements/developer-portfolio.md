@@ -3,7 +3,7 @@
 Present m0x6a's profile, work and contact details through a developer-branded portfolio.
 
 - **Implementation:** `src/app/page.tsx`, `src/content/portfolio.ts`, `src/components/tmux-shell.tsx`, `src/components/nvim-pane.tsx`
-- **Decisions:** [ADR-0002](../adr/0002-single-site-shell.md), [ADR-0003](../adr/0003-separate-content-domains.md), [ADR-0010](../adr/0010-tmux-neovim-site-interface.md)
+- **Decisions:** [ADR-0002](../adr/0002-single-site-shell.md), [ADR-0003](../adr/0003-separate-content-domains.md), [ADR-0011](../adr/0011-tmux-neovim-site-interface.md)
 
 ## PORT-1: Portfolio homepage introduces the developer
 

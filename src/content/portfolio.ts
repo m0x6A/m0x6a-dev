@@ -18,6 +18,14 @@ export type PortfolioContent = {
       description: string;
     }>;
   };
+  interests: {
+    title: string;
+    summary: string;
+    items: Array<{
+      name: string;
+      detail: string;
+    }>;
+  };
   skills: {
     title: string;
     summary: string;
@@ -35,6 +43,7 @@ export type PortfolioContent = {
       summary: string;
       impact: string;
       stack: string[];
+      href?: string;
     }>;
   };
   contact: {
@@ -53,115 +62,164 @@ export const portfolioContent: PortfolioContent = {
   identity: {
     name: "Mattias Jonsson",
     alias: "m0x6a",
-    role: "Developer building dependable web and automation systems",
-    focus: "TypeScript, product delivery, and secure-by-default workflows",
+    role: "Systems developer and architect, Sogeti Sverige AB",
+    focus: "Observability, quality systems, agentic work and digital sovereignty",
     location: "Remote-first / Sweden",
-    availability: "Open to thoughtful product and platform collaborations",
+    availability: "Open to talks and enablement on agentic coding",
     summary:
-      "I build software with a bias toward clear interfaces, predictable delivery, and tooling that respects the people maintaining it.",
+      "I build .NET and TypeScript systems and the platforms around them. Right now I'm building an observability platform at the Swedish Transport Administration, and helping development teams adopt GitHub Copilot and agentic coding.",
     highlights: [
-      "CLI-inspired interfaces with accessible, content-first design",
-      "Small systems that stay understandable as they grow",
-      "Git-native publishing and automation workflows",
+      "Three enablement assignments on GitHub Copilot and agentic coding",
+      "Talks on GitHub Copilot and spec-driven development",
+      "OpenTelemetry everywhere: from libraries to Grafana dashboards",
     ],
   },
   background: {
-    title: "Background",
+    title: "Experience",
     summary:
-      "The work is a mix of product delivery, developer experience, and the glue that makes systems easier to ship and support.",
+      "Developer and architect roles through Sogeti since 2021, after two years building and maintaining .NET systems at Empori Systems.",
     entries: [
       {
-        period: "now",
-        title: "Building developer-centric experiences",
+        period: "2025–",
+        title: "Platform developer, Swedish Transport Administration",
         description:
-          "Designing products and internal tools that reduce friction, surface meaningful status, and stay readable under change.",
+          "Part of a team establishing a new observability capability at a government agency, evaluating tools such as Splunk and the Grafana LGTM stack to build a modern, robust observability platform.",
       },
       {
-        period: "ongoing",
-        title: "Automation-first delivery mindset",
+        period: "2025–",
+        title: "AI and agentic coding enablement, Sogeti",
         description:
-          "Preferring reliable scripts, explicit contracts, and small operational feedback loops over brittle handoffs.",
+          "Three enablement assignments helping development teams adopt GitHub Copilot and agentic coding, including spec-driven development, plus several talks on Copilot and spec-driven development.",
       },
       {
-        period: "always",
-        title: "Security and maintainability by default",
+        period: "2023–2025",
+        title: "Systems developer and architect, Swedish Transport Administration",
         description:
-          "Keeping interfaces narrow, states explicit, and dependencies honest so failure modes are easier to reason about.",
+          "Restarted a paused microservices project (.NET and Angular) for communication between systems and users, owning its architecture, modernisation and DevOps setup.",
+      },
+      {
+        period: "2022–2023",
+        title: "Architect and systems developer, steel industry",
+        description:
+          "Developed and prioritised work on an existing software platform, wrote requirements for a product-data import and export tool, and mentored junior developers.",
+      },
+      {
+        period: "2021–2023",
+        title: "Systems developer, radio remote control",
+        description:
+          "Moved an access control system for cranes from JavaScript to TypeScript, built a software licensing system and migrated from Jenkins and Jira to Azure DevOps.",
+      },
+      {
+        period: "2019–2021",
+        title: "Systems developer, Empori Systems",
+        description:
+          "Maintenance, legacy integration and new development in C# and .NET, with customer contact, sprint planning and support.",
+      },
+    ],
+  },
+  interests: {
+    title: "Interests",
+    summary: "The things I keep coming back to, at work and in side projects.",
+    items: [
+      {
+        name: "Observability",
+        detail: "Making systems explain themselves through traces, metrics and logs.",
+      },
+      {
+        name: "Quality systems",
+        detail:
+          "Tests, specifications and feedback loops that keep software trustworthy as it changes.",
+      },
+      {
+        name: "Agentic work",
+        detail:
+          "AI agents as real participants in software delivery, guided by clear specifications.",
+      },
+      {
+        name: "Digital sovereignty",
+        detail:
+          "Keeping control of data and infrastructure through open standards and portable, self-hostable tools.",
       },
     ],
   },
   skills: {
     title: "Skills",
     summary:
-      "A practical toolkit centered on modern TypeScript delivery, backend integrations, and developer-friendly systems thinking.",
+      "Mostly .NET and TypeScript, with a growing share of platform, observability and agentic tooling.",
     groups: [
       {
-        name: "Application delivery",
-        detail: "Building polished product surfaces that feel fast, clear, and dependable.",
-        items: ["Next.js", "TypeScript", "React", "Design systems"],
+        name: "Application development",
+        detail: "Backends, frontends and the architecture between them.",
+        items: [".NET / C#", "ASP.NET Core", "TypeScript", "React", "Angular", "SQL"],
       },
       {
-        name: "Platform and automation",
-        detail: "Reducing operational drag with composable workflows and repeatable interfaces.",
-        items: ["GitHub Actions", "CLI tooling", "API integrations", "Release flows"],
+        name: "Architecture and messaging",
+        detail: "Splitting systems so they stay understandable as they grow.",
+        items: ["Microservices", "Modular monoliths", "DDD", "MassTransit", "RabbitMQ", ".NET Aspire"],
       },
       {
-        name: "Engineering habits",
-        detail: "Keeping architecture small enough to understand and resilient enough to extend.",
-        items: ["Testing", "Observability", "Documentation", "Secure defaults"],
+        name: "Platform and observability",
+        detail: "Running systems and seeing what they do.",
+        items: ["Kubernetes", "OpenShift", "Azure DevOps", "GitHub Actions", "OpenTelemetry", "Grafana LGTM", "Splunk"],
+      },
+      {
+        name: "Quality and agentic development",
+        detail: "Tests, specifications and agents that work from them.",
+        items: ["xUnit", "Testcontainers", "Gherkin", "GitHub Copilot", "Claude Code", "Speckit"],
       },
     ],
   },
   selectedWork: {
-    title: "Selected work",
+    title: "Projects",
     summary:
-      "A few representative themes that show up repeatedly in how I build and shape software.",
+      "Side projects where I try out the ideas I bring to client work: observability by default, clear domain models and agentic workflows.",
     entries: [
       {
-        name: "Content-driven developer sites",
+        name: "Dekori",
         summary:
-          "Pairing lightweight publishing workflows with distinctive interfaces so the content stays easy to ship.",
-        impact: "brand + publishing",
-        stack: ["Markdown", "Routing", "Structured content"],
+          "Attribute-driven instrumentation for .NET. Decorate classes and methods and get OpenTelemetry traces, metrics, logs and exception capture, with no ActivitySource or Meter plumbing in business code.",
+        impact: "open source",
+        stack: [".NET 10", "OpenTelemetry", "Castle DynamicProxy"],
+        href: "https://github.com/m0x6A/dekori",
       },
       {
-        name: "Automation surfaces for teams",
+        name: "PantryPilot",
         summary:
-          "Turning repeated delivery steps into scripts and adapters that are easier to trust, review, and improve.",
-        impact: "ops + velocity",
-        stack: ["CI/CD", "Shell", "Integrations"],
+          "Meal planning on microservices: tracks pantry inventory, suggests weekly menus from what is at home and current store offers, and builds shopping lists.",
+        impact: "microservices",
+        stack: [".NET 10", "MassTransit", "RabbitMQ", "PostgreSQL", "React", "Aspire"],
       },
       {
-        name: "Readable app architecture",
+        name: "Sagly",
         summary:
-          "Splitting domain logic, rendering, and content loading so feature work can move without tangling the whole app.",
-        impact: "maintainability",
-        stack: ["Type safety", "Modular services", "Testing"],
+          "Store and compare mountain-bike suspension and tyre setups per bike. A modular monolith with DDD and vertical slices, Strava sign-in and OpenTelemetry to Grafana Cloud.",
+        impact: "modular monolith",
+        stack: ["ASP.NET Core", "EF Core", "Azure SQL", "React", "Testcontainers"],
       },
       {
-        name: "Error states that stay humane",
+        name: "HIVE",
         summary:
-          "Making failure modes visible without collapsing the rest of the experience or masking real problems.",
-        impact: "resilience",
-        stack: ["Fallback UI", "State modeling", "Recovery paths"],
+          "A collective-intelligence framework for GitHub Copilot, where capabilities spawn, merge, split and dissolve as the work needs instead of fixed agent roles. Built on Speckit for spec-driven development.",
+        impact: "agentic",
+        stack: ["GitHub Copilot", "Custom agents", "Speckit"],
+        href: "https://github.com/m0x6A/copilot-hive",
       },
     ],
   },
   contact: {
     title: "Contact",
-    summary:
-      "The starter profile uses direct links that are easy to replace with preferred real-world contact endpoints.",
+    summary: "Get in touch about talks, enablement or anything in the interests above.",
     actions: [
       {
         label: "GitHub",
         href: "https://github.com/m0x6a",
-        note: "Follow experiments, repositories, and ongoing build work.",
+        note: "Open-source projects, experiments and agent tooling.",
         external: true,
       },
       {
         label: "Email",
         href: "mailto:hello@m0x6a.dev",
-        note: "Seed contact address for project intros, collaboration notes, and async follow-up.",
+        note: "For talks, enablement and collaboration.",
         external: true,
       },
     ],

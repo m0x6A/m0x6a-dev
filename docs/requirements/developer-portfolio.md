@@ -7,12 +7,12 @@ Present m0x6a's profile, work and contact details through a developer-branded po
 
 ## PORT-1: Portfolio homepage introduces the developer
 
-The system SHALL provide a portfolio homepage for m0x6a that presents Mattias Jonsson's name, developer identity, and dedicated sections for introduction, background, skills, selected work and contact.
+The system SHALL provide a portfolio homepage for m0x6a that presents Mattias Jonsson's name, developer identity, and dedicated sections for introduction, experience, interests, skills, projects and contact.
 
 **Scenario: Visitor opens the portfolio homepage**
 - **WHEN** a visitor loads the site root
 - **THEN** the page displays m0x6a and Mattias Jonsson as the primary identity
-- **AND** the page includes introduction, background, skills, selected work and contact sections
+- **AND** the page includes introduction, experience, interests, skills, projects and contact sections
 
 ## PORT-2: Portfolio uses a CLI-inspired visual style
 

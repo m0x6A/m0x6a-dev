@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import styles from "./key-help.module.css";
 
 const LINE_STEP = 72;
-
-function getBuffer() {
-  return document.getElementById("buffer");
-}
+const HELP_ID = "key-help";
 
 function isTyping(target: EventTarget | null) {
   return (
@@ -15,22 +13,23 @@ function isTyping(target: EventTarget | null) {
   );
 }
 
-/** j/k scroll, gg/G jump, H/L switch buffer tabs, p toggles the post preview. */
+function clickIfPresent(selector: string) {
+  const element = document.querySelector<HTMLElement>(selector);
+
+  if (!element) {
+    return false;
+  }
+
+  // Clicking lets next/link handle the basePath.
+  element.click();
+  return true;
+}
+
+/** j/k scroll, gg/G jump, H/L previous/next post, p toggles the preview, ? shows help. */
 export function VimMotions() {
   useEffect(() => {
     let pendingG = false;
     let pendingTimer: number | undefined;
-
-    function switchBuffer(offset: number) {
-      const tabs = Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-buffer]"));
-      const current = tabs.findIndex((tab) => tab.getAttribute("aria-current") === "page");
-      const next = tabs[current + offset];
-
-      // Clicking the tab lets next/link handle the basePath.
-      if (current !== -1 && next) {
-        next.click();
-      }
-    }
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) {
@@ -41,29 +40,23 @@ export function VimMotions() {
         return;
       }
 
-      const buffer = getBuffer();
-
-      if (!buffer) {
-        return;
-      }
-
       const wasPendingG = pendingG;
       pendingG = false;
       window.clearTimeout(pendingTimer);
 
       switch (event.key) {
         case "j":
-          buffer.scrollBy({ top: LINE_STEP });
+          window.scrollBy({ top: LINE_STEP });
           break;
         case "k":
-          buffer.scrollBy({ top: -LINE_STEP });
+          window.scrollBy({ top: -LINE_STEP });
           break;
         case "G":
-          buffer.scrollTo({ top: buffer.scrollHeight });
+          window.scrollTo({ top: document.documentElement.scrollHeight });
           break;
         case "g":
           if (wasPendingG) {
-            buffer.scrollTo({ top: 0 });
+            window.scrollTo({ top: 0 });
           } else {
             pendingG = true;
             pendingTimer = window.setTimeout(() => {
@@ -72,19 +65,32 @@ export function VimMotions() {
           }
           break;
         case "H":
-          switchBuffer(-1);
+          if (!clickIfPresent("[data-buffer-prev]")) {
+            return;
+          }
           break;
         case "L":
-          switchBuffer(1);
+          if (!clickIfPresent("[data-buffer-next]")) {
+            return;
+          }
           break;
-        case "p": {
-          const toggle = document.querySelector<HTMLButtonElement>("[data-view-toggle]");
+        case "p":
+          if (!clickIfPresent("[data-view-toggle]")) {
+            return;
+          }
+          break;
+        case "?": {
+          const help = document.getElementById(HELP_ID);
 
-          if (!toggle) {
+          if (!(help instanceof HTMLDialogElement)) {
             return;
           }
 
-          toggle.click();
+          if (help.open) {
+            help.close();
+          } else {
+            help.show();
+          }
           break;
         }
         default:
@@ -105,39 +111,80 @@ export function VimMotions() {
   return null;
 }
 
+const keys = [
+  { key: "j / k", action: "scroll down / up" },
+  { key: "gg / G", action: "top / bottom" },
+  { key: "H / L", action: "older / newer post" },
+  { key: "p", action: "preview / source (posts)" },
+  { key: "?", action: "toggle this help" },
+];
+
+/** A which-key style popup above the command line, opened with `?`. */
+export function KeyHelp() {
+  useEffect(() => {
+    const help = document.getElementById(HELP_ID);
+
+    if (!(help instanceof HTMLDialogElement)) {
+      return;
+    }
+
+    const dialog = help;
+
+    // A non-modal dialog doesn't close on Esc by itself.
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape" && dialog.open) {
+        dialog.close();
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  return (
+    <dialog id={HELP_ID} className={styles.help} aria-label="Keyboard shortcuts">
+      <dl>
+        {keys.map((entry) => (
+          <div key={entry.key}>
+            <dt>{entry.key}</dt>
+            <dd>{entry.action}</dd>
+          </div>
+        ))}
+      </dl>
+      <form method="dialog">
+        <button type="submit">esc close</button>
+      </form>
+    </dialog>
+  );
+}
+
 /** Lualine's scroll indicator: Top, Bot, All or a percentage. */
 export function BufferPosition() {
   const [label, setLabel] = useState("Top");
 
   useEffect(() => {
-    const buffer = getBuffer();
-
-    if (!buffer) {
-      return;
-    }
-
-    const target = buffer;
-
     function update() {
-      const scrollable = target.scrollHeight - target.clientHeight;
+      const root = document.documentElement;
+      const scrollable = root.scrollHeight - window.innerHeight;
+      const top = window.scrollY;
 
       if (scrollable <= 1) {
         setLabel("All");
-      } else if (target.scrollTop <= 1) {
+      } else if (top <= 1) {
         setLabel("Top");
-      } else if (target.scrollTop >= scrollable - 1) {
+      } else if (top >= scrollable - 1) {
         setLabel("Bot");
       } else {
-        setLabel(`${Math.round((target.scrollTop / scrollable) * 100)}%`);
+        setLabel(`${Math.round((top / scrollable) * 100)}%`);
       }
     }
 
     update();
-    target.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
 
     return () => {
-      target.removeEventListener("scroll", update);
+      window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
   }, []);

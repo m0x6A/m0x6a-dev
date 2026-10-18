@@ -1,13 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import {
-  BufferNotice,
-  KeyHints,
-  NvimPane,
-  Prompt,
-  ShellOutput,
-  ShellPane,
-} from "@/components/nvim-pane";
+import { BufferNotice, NvimPane } from "@/components/nvim-pane";
 import { TmuxShell } from "@/components/tmux-shell";
 import { getBlogIndex } from "@/lib/blog/posts";
 import styles from "./blog.module.css";
@@ -20,22 +13,17 @@ export const metadata: Metadata = {
 export default async function BlogPage() {
   const result = await getBlogIndex();
   const posts = result.status === "ready" ? result.posts : [];
-  const buffers = [
-    { label: "posts/", href: "/blog", active: true },
-    ...posts.map((post) => ({ label: `${post.slug}.md`, href: post.route })),
-  ];
 
   return (
-    <TmuxShell activeWindow="blog" statusRight={result.sourceLabel}>
+    <TmuxShell activeWindow="blog">
       <NvimPane
-        buffers={buffers}
+        path={[{ label: "~", href: "/" }, { label: "blog/" }]}
         fileName="posts/"
-        fileType="oil"
         tone={result.status === "unavailable" ? "error" : "default"}
         message={
           result.status === "unavailable"
             ? `E484: Can't open directory posts/`
-            : `"posts/" ${posts.length} ${posts.length === 1 ? "file" : "files"}`
+            : `"posts/" ${posts.length} ${posts.length === 1 ? "file" : "files"} · ${result.sourceLabel}`
         }
       >
         {result.status === "ready" ? (
@@ -82,22 +70,6 @@ export default async function BlogPage() {
           />
         )}
       </NvimPane>
-
-      <ShellPane label="Blog source">
-        <Prompt command="blog status" />
-        <ShellOutput
-          rows={[
-            { label: "source", value: result.sourceLabel },
-            {
-              label: "status",
-              value: result.status.replace("_", " "),
-              tone: result.status === "ready" ? "ok" : "error",
-            },
-            { label: "posts", value: posts.length },
-          ]}
-        />
-        <KeyHints />
-      </ShellPane>
     </TmuxShell>
   );
 }

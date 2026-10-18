@@ -26,4 +26,5 @@ Statuses: `Proposed` · `Accepted` · `Rejected` · `Deprecated` · `Superseded 
 | [0008](0008-azure-app-service-hosting.md) | Host on Azure App Service as a standalone Next.js server | Superseded by 0010 |
 | [0009](0009-split-hosting-static-web-apps-and-blog-function.md) | Split hosting: Static Web Apps frontend + managed blog Function | Rejected |
 | [0010](0010-static-export-on-github-pages.md) | Static export hosted on GitHub Pages | Accepted |
-| [0011](0011-tmux-neovim-site-interface.md) | tmux and Neovim interface for the site | Accepted |
+| [0011](0011-tmux-neovim-site-interface.md) | tmux and Neovim interface for the site | Superseded by 0012 |
+| [0012](0012-simplify-tmux-shell-navigation.md) | Simplify the tmux shell's navigation and chrome | Accepted |

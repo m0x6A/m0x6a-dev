@@ -23,10 +23,14 @@
 
   position: relative;
   z-index: 1;
+  /* Heights of the sticky bars, used to offset anchors and the help popup. */
+  --bar-h: 1.75rem;
+  --winbar-h: 1.9rem;
+
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--nv-bg);
   color: var(--nv-fg);
   font-family: var(--font-mono);
@@ -53,14 +57,17 @@
 .panes {
   display: flex;
   flex: 1;
-  min-height: 0;
+  flex-direction: column;
 }
 
 .statusBar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   display: flex;
   align-items: stretch;
   flex-shrink: 0;
-  min-height: 1.75rem;
+  height: var(--bar-h);
   background: var(--nv-bg-dark);
   color: var(--nv-fg-dark);
   font-size: 0.85rem;
@@ -106,15 +113,21 @@
   font-weight: 700;
 }
 
-.statusRight {
-  margin-left: auto;
-  padding: 0 0.75rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--nv-muted);
+.index {
+  color: var(--nv-comment);
+}
+
+.activeWindow .index {
+  color: inherit;
+}
+
+.external {
+  margin-left: 0.25ch;
+  color: var(--nv-comment);
 }
 
 .host {
+  margin-left: auto;
   padding: 0 0.75rem 0 1.1rem;
   background: var(--nv-blue);
   color: var(--nv-black);
@@ -132,7 +145,7 @@
     font-size: 14px;
   }
 
-  .statusRight,
+  .index,
   .host {
     display: none;
   }

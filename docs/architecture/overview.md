@@ -13,9 +13,9 @@ src/
 │   ├── layout.tsx, globals.css               root layout + design tokens
 │   └── not-found.tsx
 ├── components/
-│   ├── tmux-shell.tsx         shared tmux frame; status bar is the primary navigation
-│   ├── nvim-pane.tsx          Neovim pane, zsh side pane, BufferNotice error/empty states
-│   ├── vim-motions.tsx        client: j/k, gg/G, H/L and the scroll indicator
+│   ├── tmux-shell.tsx         shared tmux frame; top status bar is the primary navigation
+│   ├── nvim-pane.tsx          Neovim pane with winbar, inline TOC, :bprev/:bnext, BufferNotice
+│   ├── vim-motions.tsx        client: j/k, gg/G, H/L, ?, the key help popup and scroll indicator
 │   └── blog-markdown.tsx      react-markdown + remark-gfm renderer
 ├── content/portfolio.ts       typed portfolio content
 └── lib/blog/

@@ -2,7 +2,7 @@
 # ═══════════════════════════════════════════════════════════════════════════
 # install-deps.sh — install everything the tmux / zsh / Neovim setup needs.
 #
-# Supports: macOS (Homebrew), Fedora (dnf), Ubuntu / Debian / WSL (apt).
+# Supports: macOS (Homebrew), Fedora (dnf), Ubuntu 25.10+ / Debian 13+ / WSL (apt).
 # Safe to re-run: anything already installed is skipped.
 # It installs TOOLS only; it never overwrites your config files.
 #
@@ -18,6 +18,7 @@
 #   core      git curl unzip tar make/gcc zsh tmux neovim(0.12+) vim ripgrep fd
 #             fzf bat tree jq file zoxide clipboard-tool (wl-clipboard/xclip)
 #   shell     oh-my-zsh, oh-my-posh, tmux plugin manager (TPM)
+#   git, md   lazygit (git UI), glow (markdown reader)
 #   files     yazi + preview helpers (7zip, poppler, ffmpeg, imagemagick)
 #             + its Tokyo Night flavor
 #   neovim    tree-sitter CLI; plugins via lazy.nvim; lua_ls + taplo via Mason
@@ -52,6 +53,11 @@ section() { printf '\n%s== %s ==%s\n' "$B" "$*" "$N"; }
 ok()      { printf '  %s✓%s %s\n' "$G" "$N" "$*"; }
 skip()    { printf '  %s–%s %s\n' "$Y" "$N" "$*"; }
 have()    { command -v "$1" >/dev/null 2>&1; }
+
+# Full output of every step goes to this log; the screen shows one line per
+# step, plus the last lines of output when a step fails.
+LOG="${XDG_CACHE_HOME:-$HOME/.cache}/install-deps.log"
+mkdir -p "$(dirname "$LOG")" && : > "$LOG"
 
 # Full output of every step goes to this log; the screen shows one line per
 # step, plus the last lines of output when a step fails.
@@ -127,6 +133,7 @@ install_mac() {
   fi
   step "core tools" brew install git curl neovim vim tmux ripgrep fd fzf bat tree jq zoxide tree-sitter-cli
   step "yazi + preview helpers" brew install yazi ffmpeg sevenzip poppler imagemagick
+  step "lazygit + glow" brew install lazygit glow
   step "oh-my-posh" brew install jandedobbeleer/oh-my-posh/oh-my-posh
   if [ "$WITH_FONTS" = 1 ]; then step "JetBrainsMono Nerd Font" brew install --cask font-jetbrains-mono-nerd-font; fi
   if [ "$WITH_CSHARP" = 1 ]; then step ".NET SDK" brew install --cask dotnet-sdk; fi
@@ -143,6 +150,16 @@ install_fedora() {
     step "yazi" $SUDO dnf install -y yazi
   else skip "yazi already installed"; fi
   step "yazi preview helpers" $SUDO dnf install -y 7zip poppler-utils ImageMagick ffmpeg-free
+  if ! have lazygit; then
+    step "lazygit COPR repo" $SUDO dnf copr enable -y dejan/lazygit
+    step "lazygit" $SUDO dnf install -y lazygit
+  else skip "lazygit already installed"; fi
+  if ! have glow; then
+    step "Charm repo (glow)" bash -c "printf '%s\\n' '[charm]' 'name=Charm' \\
+      'baseurl=https://repo.charm.sh/yum/' 'enabled=1' 'gpgcheck=1' \\
+      'gpgkey=https://repo.charm.sh/yum/gpg.key' | $SUDO tee /etc/yum.repos.d/charm.repo >/dev/null"
+    step "glow" $SUDO dnf install -y glow
+  else skip "glow already installed"; fi
   if [ "$WITH_CSHARP" = 1 ]; then step ".NET SDK" $SUDO dnf install -y dotnet-sdk-10.0; fi
 }
 
@@ -195,6 +212,22 @@ install_ubuntu() {
       set -eo pipefail; curl -fsSL https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-$ts_arch.gz \
         | gunzip > '$BIN/tree-sitter'; chmod +x '$BIN/tree-sitter'"
   else skip "tree-sitter already installed"; fi
+
+  # lazygit is in apt from Ubuntu 25.10
+  if ! have lazygit; then
+    step "lazygit" $SUDO apt-get install -y -qq lazygit
+  else skip "lazygit already installed"; fi
+
+  # glow: from Charm's own apt repository
+  if ! have glow; then
+    step "Charm repo (glow)" bash -c "
+      set -eo pipefail
+      $SUDO mkdir -p /etc/apt/keyrings
+      curl -fsSL https://repo.charm.sh/apt/gpg.key | $SUDO gpg --dearmor --yes -o /etc/apt/keyrings/charm.gpg
+      echo 'deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *' | $SUDO tee /etc/apt/sources.list.d/charm.list >/dev/null
+      $SUDO apt-get update -qq"
+    step "glow" $SUDO apt-get install -y -qq glow
+  else skip "glow already installed"; fi
 
   if [ "$WITH_CSHARP" = 1 ] && ! have dotnet; then
     step ".NET SDK (apt)" $SUDO apt-get install -y -qq dotnet-sdk-10.0 \
@@ -324,7 +357,7 @@ install_nvim_plugins
 # ─── Summary ──────────────────────────────────────────────────────────────
 section "Summary"
 if [ "$DRY_RUN" = 0 ]; then
-  for t in zsh tmux nvim fzf fd rg bat yazi oh-my-posh tree-sitter; do
+  for t in zsh tmux nvim fzf fd rg bat yazi lazygit glow oh-my-posh tree-sitter; do
     if have "$t"; then ok "$t"; else printf '  %s✗%s %s missing\n' "$R" "$N" "$t"; fi
   done
   [ "$WITH_RUST" = 1 ] && { have rust-analyzer && ok rust-analyzer || printf '  %s✗%s rust-analyzer missing\n' "$R" "$N"; }

@@ -1,0 +1,54 @@
+/* which-key: a bordered popup that sits just above lualine. */
+.help {
+  position: fixed;
+  inset: auto 1rem calc(3.5rem + 0.5rem) auto;
+  z-index: 6;
+  min-width: 34ch;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--nv-blue);
+  background: var(--nv-bg-dark);
+  color: var(--nv-fg-dark);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.help dl {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.help dl div {
+  display: grid;
+  grid-template-columns: 8ch 1fr;
+  gap: 1ch;
+}
+
+.help dt {
+  color: var(--nv-yellow);
+}
+
+.help form {
+  margin-top: 0.5rem;
+  text-align: right;
+}
+
+.help button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--nv-comment);
+  cursor: pointer;
+}
+
+.help button:hover,
+.help button:focus-visible {
+  color: var(--nv-fg);
+}
+
+@media (max-width: 640px) {
+  .help {
+    inset: auto 1rem 1rem;
+    min-width: 0;
+  }
+}

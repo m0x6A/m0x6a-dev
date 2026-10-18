@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BlogMarkdown } from "@/components/blog-markdown";
 import {
+  BufferNav,
   BufferNotice,
-  KeyHints,
   NvimPane,
-  ShellPane,
   TableOfContents,
 } from "@/components/nvim-pane";
 import { TmuxShell } from "@/components/tmux-shell";
@@ -65,22 +64,18 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   const fileName = `${slug}.md`;
-  const buffers = [
-    { label: "posts/", href: "/blog" },
-    ...(index.status === "ready" ? index.posts : []).map((post) => ({
-      label: `${post.slug}.md`,
-      href: post.route,
-      active: post.slug === slug,
-    })),
+  const path = [
+    { label: "~", href: "/" },
+    { label: "blog", href: "/blog" },
+    { label: fileName },
   ];
 
   if (result.status === "unavailable") {
     return (
-      <TmuxShell activeWindow="blog" statusRight={result.sourceLabel}>
+      <TmuxShell activeWindow="blog">
         <NvimPane
-          buffers={buffers}
+          path={path}
           fileName={fileName}
-          fileType="markdown"
           tone="error"
           message={`E484: Can't open file ${fileName}`}
         >
@@ -100,13 +95,17 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { post } = result;
   const headings = extractHeadings(post.content);
   const lineCount = countLines(post.content);
+  // The index is newest first: the previous buffer is the older post.
+  const posts = index.status === "ready" ? index.posts : [];
+  const position = posts.findIndex((entry) => entry.slug === slug);
+  const older = position === -1 ? undefined : posts[position + 1];
+  const newer = position > 0 ? posts[position - 1] : undefined;
 
   return (
-    <TmuxShell activeWindow="blog" statusRight={`${fileName} · ${post.publishedLabel}`}>
+    <TmuxShell activeWindow="blog">
       <NvimPane
-        buffers={buffers}
+        path={path}
         fileName={fileName}
-        fileType="markdown"
         tone="preview"
         actions={<ViewToggle />}
         message={
@@ -145,14 +144,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </p>
             <h1>{post.title}</h1>
           </header>
+          <TableOfContents fileName={fileName} headings={headings} />
           <BlogMarkdown content={post.content} />
+          <BufferNav
+            prev={older ? { href: older.route, label: `${older.slug}.md` } : undefined}
+            next={newer ? { href: newer.route, label: `${newer.slug}.md` } : undefined}
+          />
         </article>
       </NvimPane>
-
-      <ShellPane label="Table of contents">
-        <TableOfContents fileName={fileName} headings={headings} />
-        <KeyHints extra={[{ label: "p", value: "preview / source" }]} />
-      </ShellPane>
     </TmuxShell>
   );
 }

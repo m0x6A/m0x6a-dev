@@ -3,11 +3,14 @@ import { TmuxShell } from "@/components/tmux-shell";
 
 export default function BlogPostNotFound() {
   return (
-    <TmuxShell activeWindow="blog" statusRight="E484">
+    <TmuxShell activeWindow="blog">
       <NvimPane
-        buffers={[{ label: "posts/", href: "/blog" }]}
+        path={[
+          { label: "~", href: "/" },
+          { label: "blog", href: "/blog" },
+          { label: "[No Name]" },
+        ]}
         fileName="[No Name]"
-        fileType="markdown"
         tone="error"
         message="E484: Can't open file: no such post"
       >

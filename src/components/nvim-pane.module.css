@@ -1,75 +1,87 @@
 .pane {
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-width: 0;
-  min-height: 0;
-  border-top: 1px solid var(--nv-gutter);
+  border-top: 1px solid var(--nv-border-active);
 }
 
-/* tmux draws the active pane's border in the accent colour. */
-.focused {
-  flex: 1;
-  border-top-color: var(--nv-border-active);
-}
-
-/* Bufferline */
-.tabbar {
+/* Winbar: a breadcrumb of the open buffer, sticky under the tmux bar. */
+.winbar {
+  position: sticky;
+  top: var(--bar-h);
+  z-index: 4;
   display: flex;
   flex-shrink: 0;
-  background: var(--nv-bg-dark);
-}
-
-.tabline {
-  display: flex;
-  flex: 1;
-  min-width: 0;
-  overflow-x: auto;
+  height: var(--winbar-h);
   background: var(--nv-bg-dark);
   font-size: 0.85rem;
-  line-height: 1.9rem;
+  line-height: var(--winbar-h);
   white-space: nowrap;
-  scrollbar-width: none;
 }
 
-.tab {
-  padding: 0 1rem;
-  border-right: 1px solid var(--nv-black);
-  color: var(--nv-muted);
+.breadcrumb {
+  flex: 1;
+  min-width: 0;
 }
 
-.tab:hover {
+.breadcrumb ol {
+  display: flex;
+  padding: 0 0.75rem;
+  list-style: none;
+}
+
+/* A long file name ellipsizes instead of pushing the actions off screen. */
+.breadcrumb li:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.breadcrumb li + li::before {
+  content: "›";
+  content: "›" / "";
+  padding: 0 1ch;
+  color: var(--nv-comment);
+}
+
+.breadcrumb a {
+  color: var(--nv-blue);
+}
+
+.breadcrumb a:hover,
+.breadcrumb a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.breadcrumb [aria-current="page"] {
   color: var(--nv-fg);
+  font-weight: 700;
 }
 
-.tabActions {
+.winbarActions {
   display: flex;
   flex-shrink: 0;
   border-left: 1px solid var(--nv-black);
 }
 
-.tabActions button {
+.winbarActions button {
   padding: 0 1rem;
   border: 0;
   background: none;
   color: var(--nv-magenta);
   font-size: 0.85rem;
-  line-height: 1.9rem;
+  line-height: var(--winbar-h);
   cursor: pointer;
 }
 
-.tabActions button[aria-pressed="false"] {
+.winbarActions button[aria-pressed="false"] {
   color: var(--nv-blue);
 }
 
-.tabActions button:hover {
+.winbarActions button:hover {
   background: var(--nv-bg-highlight);
-}
-
-.activeTab {
-  background: var(--nv-bg);
-  box-shadow: inset 0 2px 0 var(--nv-blue);
-  color: var(--nv-fg);
-  font-weight: 700;
 }
 
 /* Buffer: line numbers live in the gutter, the colour column marks 80ch. */
@@ -77,21 +89,12 @@
   --gutter: 6ch;
 
   flex: 1;
-  min-height: 0;
-  overflow-y: auto;
   padding: 1.25rem 1.5rem 0 calc(var(--gutter) + 1.25rem);
   counter-reset: line;
   background:
     linear-gradient(var(--nv-bg-highlight), var(--nv-bg-highlight)) no-repeat
       calc(var(--gutter) + 1.25rem + 82ch) 0 / 1px 100%,
     var(--nv-bg);
-  background-attachment: local;
-  scroll-behavior: smooth;
-  scroll-padding-top: 1rem;
-}
-
-.buffer:focus-visible {
-  outline: none;
 }
 
 .text {
@@ -114,8 +117,11 @@
   line-height: 1.75;
 }
 
-/* Lualine */
+/* Lualine and the command line stick to the bottom of the viewport. */
 .statusline {
+  position: sticky;
+  bottom: 1.75rem;
+  z-index: 4;
   display: flex;
   flex-shrink: 0;
   background: var(--nv-bg-dark);
@@ -126,16 +132,12 @@
   overflow: hidden;
 }
 
-.mode,
-.branch {
-  padding: 0 1.1rem 0 0.75rem;
-  clip-path: polygon(0 0, calc(100% - 0.55rem) 0, 100% 50%, calc(100% - 0.55rem) 100%, 0 100%);
-}
-
 .mode {
+  padding: 0 1.1rem 0 0.75rem;
   background: var(--nv-blue);
   color: var(--nv-black);
   font-weight: 700;
+  clip-path: polygon(0 0, calc(100% - 0.55rem) 0, 100% 50%, calc(100% - 0.55rem) 100%, 0 100%);
 }
 
 .errorMode {
@@ -146,27 +148,11 @@
   background: var(--nv-magenta);
 }
 
-.branch {
-  margin-left: -0.3rem;
-  padding-left: 1rem;
-  background: var(--nv-gutter);
-  color: var(--nv-blue);
-}
-
 .fileName {
   margin-right: auto;
   padding: 0 0.75rem;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.readonly {
-  color: var(--nv-red);
-}
-
-.meta {
-  padding: 0 0.6rem;
-  color: var(--nv-muted);
 }
 
 .position {
@@ -180,122 +166,77 @@
 }
 
 .cmdline {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  display: flex;
+  gap: 2ch;
   flex-shrink: 0;
+  height: 1.75rem;
   padding: 0 0.75rem;
-  overflow: hidden;
+  background: var(--nv-bg);
+  color: var(--nv-fg-dark);
   font-size: 0.85rem;
   line-height: 1.75rem;
-  text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--nv-fg-dark);
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.helpHint {
+  display: none;
+  color: var(--nv-comment);
+}
+
+@media (hover: hover) {
+  .helpHint {
+    display: block;
+  }
 }
 
 .errorMessage {
   color: var(--nv-red);
 }
 
-/* zsh pane */
-.shell {
+/* Inline table of contents */
+.tocBlock summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.tocBlock summary::-webkit-details-marker {
   display: none;
-  width: 38ch;
-  flex-shrink: 0;
-  border-left: 1px solid var(--nv-gutter);
-  background: var(--nv-bg);
 }
 
-.shellBody {
-  display: grid;
-  align-content: start;
-  gap: 0.6rem;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 1rem;
-  font-size: 0.85rem;
-  line-height: 1.6;
+.tocBlock summary::before {
+  content: "▸ ";
+  content: "▸ " / "";
+  color: var(--nv-comment);
 }
 
-.prompt {
-  margin-top: 0.4rem;
-  overflow-wrap: anywhere;
+.tocBlock[open] summary::before {
+  content: "▾ ";
+  content: "▾ " / "";
 }
 
-.prompt:first-child {
-  margin-top: 0;
-}
-
-.cwd {
-  color: var(--nv-cyan);
-  font-weight: 700;
-}
-
-.branchName {
-  color: var(--nv-magenta);
-}
-
-.chevron {
-  color: var(--nv-green);
-}
-
-.command {
-  color: var(--nv-fg);
-}
-
-.cursor {
-  display: inline-block;
-  width: 1ch;
-  height: 1.15em;
-  vertical-align: text-bottom;
-  background: var(--nv-fg);
-  animation: blink 1.1s steps(1) infinite;
-}
-
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cursor {
-    animation: none;
-  }
-
-  .buffer {
-    scroll-behavior: auto;
-  }
-}
-
-.output {
-  display: grid;
-  gap: 0.15rem;
-}
-
-.output div {
-  display: grid;
-  grid-template-columns: 9ch 1fr;
-  gap: 1ch;
-}
-
-.output dt {
-  color: var(--nv-yellow);
-}
-
-.output dd {
+.tocCommand {
   color: var(--nv-fg-dark);
-  overflow-wrap: anywhere;
 }
 
-.output .ok {
-  color: var(--nv-green);
-}
-
-.output .error {
-  color: var(--nv-red);
+.tocCount {
+  color: var(--nv-comment);
 }
 
 .toc {
   display: grid;
   gap: 0.2rem;
+  margin-top: 0.4rem;
+  padding-left: 2ch;
   list-style: none;
 }
 
@@ -329,9 +270,28 @@
   color: var(--nv-yellow);
 }
 
-.noMatches {
-  color: var(--nv-comment);
-  font-style: italic;
+/* :bprev / :bnext */
+:global(.nv-lines).bufferNav {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--nv-gutter);
+}
+
+.bufferNav p {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 2ch;
+}
+
+.bufferLink {
+  color: var(--nv-blue);
+}
+
+.bufferLink:hover,
+.bufferLink:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* BufferNotice */
@@ -351,21 +311,21 @@
   color: var(--nv-muted);
 }
 
-@media (min-width: 1180px) {
-  .shell {
-    display: flex;
-  }
-}
-
+/* Mobile: drop the editor chrome, keep the content and the colours. */
 @media (max-width: 640px) {
   .buffer {
-    --gutter: 3.5ch;
+    --gutter: 0px;
 
-    padding: 1rem 1rem 0 calc(var(--gutter) + 0.9rem);
+    padding: 1rem 1rem 0;
     background: var(--nv-bg);
   }
 
-  .meta {
+  .tildes,
+  .statusline {
+    display: none;
+  }
+
+  .cmdline:not(.errorMessage) {
     display: none;
   }
 }

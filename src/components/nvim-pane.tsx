@@ -3,57 +3,55 @@ import type { ReactNode } from "react";
 import { BufferPosition } from "./vim-motions";
 import styles from "./nvim-pane.module.css";
 
-export type NvimBuffer = {
+export type PathSegment = {
   label: string;
-  href: string;
-  active?: boolean;
+  href?: string;
 };
 
 type NvimPaneProps = {
-  buffers: NvimBuffer[];
+  /** Winbar breadcrumb; the last segment is the open buffer. */
+  path: PathSegment[];
   fileName: string;
-  fileType: string;
   message: ReactNode;
   tone?: "default" | "error" | "preview";
-  /** Controls shown at the right end of the bufferline. */
+  /** Controls shown at the right end of the winbar. */
   actions?: ReactNode;
   children: ReactNode;
 };
 
-/** A Neovim window: bufferline, numbered buffer, lualine and command line. */
+/** A Neovim window: winbar, numbered buffer, lualine and command line. */
 export function NvimPane({
-  buffers,
+  path,
   fileName,
-  fileType,
   message,
   tone = "default",
   actions,
   children,
 }: NvimPaneProps) {
   return (
-    <section
-      key={fileName}
-      className={`${styles.pane} ${styles.focused}`}
-      aria-label={`Editor: ${fileName}`}
-    >
-      <div className={styles.tabbar}>
-        <nav className={styles.tabline} aria-label="Posts">
-          {buffers.map((buffer) => (
-            <Link
-              key={buffer.href}
-              href={buffer.href}
-              className={`${styles.tab} ${buffer.active ? styles.activeTab : ""}`}
-              aria-current={buffer.active ? "page" : undefined}
-              data-buffer=""
-            >
-              {buffer.label}
-            </Link>
-          ))}
+    <section key={fileName} className={styles.pane} aria-label={`Editor: ${fileName}`}>
+      <div className={styles.winbar}>
+        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+          <ol>
+            {path.map((segment, index) => {
+              const isLast = index === path.length - 1;
+
+              return (
+                <li key={`${segment.label}-${index}`}>
+                  {segment.href && !isLast ? (
+                    <Link href={segment.href}>{segment.label}</Link>
+                  ) : (
+                    <span aria-current={isLast ? "page" : undefined}>{segment.label}</span>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
         </nav>
-        {actions ? <div className={styles.tabActions}>{actions}</div> : null}
+        {actions ? <div className={styles.winbarActions}>{actions}</div> : null}
       </div>
 
-      <div id="buffer" className={styles.buffer} tabIndex={0}>
+      <div id="buffer" className={styles.buffer}>
         <div className={styles.text}>{children}</div>
         <div className={styles.tildes} aria-hidden="true" />
       </div>
@@ -69,130 +67,80 @@ export function NvimPane({
             {tone === "error" ? "ERROR" : "NORMAL"}
           </span>
         )}
-        <span className={styles.branch}>⎇ main</span>
-        <span className={styles.fileName}>
-          {fileName} <span className={styles.readonly}>[RO]</span>
-        </span>
-        <span className={styles.meta}>{fileType}</span>
-        <span className={styles.meta}>utf-8</span>
+        <span className={styles.fileName}>{fileName}</span>
         <span className={styles.position}>
           <BufferPosition />
         </span>
       </div>
 
-      <p className={`${styles.cmdline} ${tone === "error" ? styles.errorMessage : ""}`}>
-        {message}
-      </p>
+      <div className={`${styles.cmdline} ${tone === "error" ? styles.errorMessage : ""}`}>
+        <p className={styles.message}>{message}</p>
+        <p className={styles.helpHint} aria-hidden="true">
+          ? for keys
+        </p>
+      </div>
     </section>
   );
 }
 
-type ShellPaneProps = {
-  label: string;
-  cwd?: string;
-  children: ReactNode;
-};
-
-/** A narrow tmux pane running zsh next to the editor. Hidden on small screens. */
-export function ShellPane({ label, cwd, children }: ShellPaneProps) {
-  return (
-    <aside className={`${styles.pane} ${styles.shell}`} aria-label={label}>
-      <div className={styles.shellBody}>
-        {children}
-        <Prompt cwd={cwd} />
-      </div>
-    </aside>
-  );
-}
-
-type PromptProps = {
-  cwd?: string;
-  command?: string;
-};
-
-export function Prompt({ cwd = "~/blog", command }: PromptProps) {
-  return (
-    <p className={styles.prompt}>
-      <span className={styles.cwd}>{cwd}</span>{" "}
-      <span className={styles.branchName}>main</span>{" "}
-      <span className={styles.chevron}>❯</span>{" "}
-      {command ? (
-        <span className={styles.command}>{command}</span>
-      ) : (
-        <span className={styles.cursor} aria-hidden="true" />
-      )}
-    </p>
-  );
-}
-
-type OutputRow = {
-  label: string;
-  value: ReactNode;
-  tone?: "ok" | "error";
-};
-
-/** Two-column command output, like `key   value`. */
-export function ShellOutput({ rows }: { rows: OutputRow[] }) {
-  return (
-    <dl className={styles.output}>
-      {rows.map((row) => (
-        <div key={row.label}>
-          <dt>{row.label}</dt>
-          <dd className={row.tone ? styles[row.tone] : undefined}>{row.value}</dd>
-        </div>
-      ))}
-    </dl>
-  );
-}
-
-const keys = [
-  { label: "j / k", value: "scroll down / up" },
-  { label: "gg / G", value: "top / bottom" },
-  { label: "H / L", value: "previous / next buffer" },
-];
-
-type KeyHintsProps = {
-  cwd?: string;
-  extra?: OutputRow[];
-};
-
-export function KeyHints({ cwd, extra = [] }: KeyHintsProps) {
-  return (
-    <>
-      <Prompt cwd={cwd} command="cat keys.txt" />
-      <ShellOutput rows={[...keys, ...extra]} />
-    </>
-  );
-}
-
 type TableOfContentsProps = {
-  cwd?: string;
   fileName: string;
   headings: Array<{ id: string; text: string; depth: 2 | 3 }>;
 };
 
-/** `grep '^##'` output that links to each heading in the buffer. */
-export function TableOfContents({ cwd, fileName, headings }: TableOfContentsProps) {
+/** Collapsible `grep '^##'` output that links to each heading in the buffer. */
+export function TableOfContents({ fileName, headings }: TableOfContentsProps) {
+  if (headings.length < 3) {
+    return null;
+  }
+
   return (
-    <>
-      <Prompt cwd={cwd} command={`grep '^##' ${fileName}`} />
-      {headings.length > 0 ? (
-        <nav aria-label="Table of contents">
-          <ol className={styles.toc}>
-            {headings.map((heading) => (
-              <li
-                key={heading.id}
-                className={heading.depth === 3 ? styles.tocNested : undefined}
-              >
-                <a href={`#${heading.id}`}>{heading.text}</a>
-              </li>
-            ))}
-          </ol>
-        </nav>
-      ) : (
-        <p className={styles.noMatches}>(no headings)</p>
-      )}
-    </>
+    <details className={`nv-lines ${styles.tocBlock}`}>
+      <summary>
+        <span className={styles.tocCommand}>grep &apos;^##&apos; {fileName}</span>{" "}
+        <span className={styles.tocCount}>({headings.length})</span>
+      </summary>
+      <nav aria-label="Table of contents">
+        <ol className={styles.toc}>
+          {headings.map((heading) => (
+            <li key={heading.id} className={heading.depth === 3 ? styles.tocNested : undefined}>
+              <a href={`#${heading.id}`}>{heading.text}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </details>
+  );
+}
+
+type BufferNavProps = {
+  prev?: { href: string; label: string };
+  next?: { href: string; label: string };
+};
+
+/** `:bprev` / `:bnext` links at the end of a post. H and L click them. */
+export function BufferNav({ prev, next }: BufferNavProps) {
+  if (!prev && !next) {
+    return null;
+  }
+
+  return (
+    <nav className={`nv-lines ${styles.bufferNav}`} aria-label="Posts">
+      <p>
+        {prev ? (
+          <Link href={prev.href} className={styles.bufferLink} data-buffer-prev="">
+            <span className={styles.noticeCommand}>:bprev</span> ← {prev.label}
+          </Link>
+        ) : (
+          <span />
+        )}
+        {next ? (
+          <Link href={next.href} className={styles.bufferLink} data-buffer-next="">
+            {next.label} → <span className={styles.noticeCommand}>:bnext</span>
+          </Link>
+        ) : null}
+      </p>
+    </nav>
   );
 }
 

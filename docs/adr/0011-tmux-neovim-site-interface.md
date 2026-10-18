@@ -1,6 +1,6 @@
 # ADR-0011: tmux and Neovim interface for the site
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0012](0012-simplify-tmux-shell-navigation.md)
 - **Date:** 2026-10-15
 - **Related:** [ADR-0006](0006-cli-styling-as-design-layer.md), [Developer portfolio](../requirements/developer-portfolio.md), [Git-backed blog](../requirements/git-backed-blog.md)
 

@@ -1,13 +1,6 @@
 import Link from "next/link";
 import { portfolioContent } from "@/content/portfolio";
-import {
-  KeyHints,
-  NvimPane,
-  Prompt,
-  ShellOutput,
-  ShellPane,
-  TableOfContents,
-} from "@/components/nvim-pane";
+import { NvimPane } from "@/components/nvim-pane";
 import { TmuxShell } from "@/components/tmux-shell";
 import styles from "./page.module.css";
 
@@ -16,20 +9,12 @@ const fileName = "README.md";
 export default function Home() {
   const { identity, background, interests, skills, selectedWork, contact } = portfolioContent;
   const [primaryContact] = contact.actions;
-  const sections = [
-    { id: "experience", text: background.title, depth: 2 as const },
-    { id: "interests", text: interests.title, depth: 2 as const },
-    { id: "skills", text: skills.title, depth: 2 as const },
-    { id: "work", text: selectedWork.title, depth: 2 as const },
-    { id: "contact", text: contact.title, depth: 2 as const },
-  ];
 
   return (
-    <TmuxShell activeWindow="home" statusRight={`${identity.alias} · ${identity.location}`}>
+    <TmuxShell activeWindow="home">
       <NvimPane
-        buffers={[{ label: fileName, href: "/", active: true }]}
+        path={[{ label: "~", href: "/" }, { label: fileName }]}
         fileName={fileName}
-        fileType="markdown"
         message={`"${fileName}" [readonly] ${identity.alias}@portfolio`}
       >
         <header className={`nv-lines ${styles.frontmatter}`}>
@@ -169,19 +154,6 @@ export default function Home() {
           ))}
         </section>
       </NvimPane>
-
-      <ShellPane label="About" cwd="~">
-        <Prompt cwd="~" command="whoami" />
-        <ShellOutput
-          rows={[
-            { label: "name", value: identity.name },
-            { label: "alias", value: identity.alias },
-            { label: "where", value: identity.location },
-          ]}
-        />
-        <TableOfContents cwd="~" fileName={fileName} headings={sections} />
-        <KeyHints cwd="~" />
-      </ShellPane>
     </TmuxShell>
   );
 }

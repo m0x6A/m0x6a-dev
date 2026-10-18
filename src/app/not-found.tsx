@@ -3,11 +3,10 @@ import { TmuxShell } from "@/components/tmux-shell";
 
 export default function NotFoundPage() {
   return (
-    <TmuxShell activeWindow="home" statusRight="E484">
+    <TmuxShell activeWindow="home">
       <NvimPane
-        buffers={[{ label: "README.md", href: "/" }]}
+        path={[{ label: "~", href: "/" }, { label: "[No Name]" }]}
         fileName="[No Name]"
-        fileType="text"
         tone="error"
         message="E484: Can't open file: no such route"
       >

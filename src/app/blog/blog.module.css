@@ -118,3 +118,9 @@
     animation: none;
   }
 }
+
+@media (max-width: 640px) {
+  .permissions {
+    display: none;
+  }
+}

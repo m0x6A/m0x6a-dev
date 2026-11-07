@@ -101,4 +101,12 @@ the post.
 
 Corrections Mattias has made to drafts, newest first. Apply these on top of the rules above.
 
-- (none yet)
+- **Leave the working session out of the post.** Nothing about how the post or the thing it
+  describes was worked out in the chat: what was asked "this morning", refactors and trade-offs
+  discussed along the way, decisions still pending in other repos. If a paragraph only makes sense
+  to someone who saw the conversation, it does not belong in the post.
+- **Don't overstate his experience or seniority.** No phrasing that implies he has worked
+  longer, done more or held more senior roles than he has said himself. "Mattered for as long
+  as I've been working" was cut for suggesting a longer career than he has. Make a point about
+  the practice ("the basics of good engineering, long before agents") without measuring it
+  against his career.

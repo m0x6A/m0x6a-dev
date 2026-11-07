@@ -27,7 +27,7 @@ The way I think about it, it's a digital twin of my own thinking. What I've read
 
 ## Turning it into a graph
 
-The documents are mirrored into the repository where my talks live, and there they are broken into a graph of about 350 nodes, concepts, practices, stories, claims, quotes, hooks and outlines, with typed links between them. Every talk is a node that links to what it uses, so I can see which talks use a certain story, or which practices nothing has used yet. CI fails if a knowledge base document has changed and the graph hasn't, so the two can't drift apart without me noticing.
+The documents are mirrored into the repository where my talks live, and there they are broken into a graph of almost 400 nodes, books, concepts, practices, stories, claims, quotes, hooks and outlines, with typed links between them. Every talk is a node that links to what it uses, so I can see which talks use a certain story, or which practices nothing has used yet. CI fails if a knowledge base document has changed and the graph hasn't, so the two can't drift apart without me noticing.
 
 I asked this morning if there was a more efficient way to store it, and it turned out most of the repository was generated pages for browsing the graph, and every update rewrote dozens of them just to change a backlink. So now only the graph source is committed and the pages are built in CI. That also meant I lost browsing the graph on GitHub, so I'm now deciding whether to publish the pages as a site, since a GitHub Pages site for a private repository on a personal account is public.
 

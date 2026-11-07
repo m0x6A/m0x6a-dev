@@ -5,7 +5,7 @@ summary: "I hold quite a lot of talks about GitHub Copilot and agentic engineeri
 slug: "curated-knowledge-base-for-talks"
 ---
 
-I work as Lead Technologist at Sogeti, and I've been holding quite a lot of talks about GitHub Copilot and agentic engineering, and how observability and good engineering practice fit into it. Most of them are for knowledge sharing internally and in my enablement assignments, and some are at events, like the [Rise and Shine event in Borlänge this spring](https://www.linkedin.com/posts/johanbjarneryd_riktigt-kul-att-f%C3%A5-komma-till-borl%C3%A4nge-ig%C3%A5r-ugcPost-7465391033573564416-cgjw/). For a while now I've been using AI and agents to reason through them and build them. Somewhere along the way it became obvious that the material itself was worth keeping, so I started a curated and quite opinionated knowledge base for the things I think are important, and the talks are now built from it.
+I work as Lead Technologist at Sogeti, and I've been holding quite a lot of talks about GitHub Copilot and agentic engineering, and how observability and good engineering practice fit into it. Most of them are for knowledge sharing internally and in my enablement assignments, and some are at events, like the [Rise and Shine event in Borlänge this spring](https://www.linkedin.com/feed/update/urn:li:activity:7464978518574252032/). For a while now I've been using AI and agents to reason through them and build them. Somewhere along the way it became obvious that the material itself was worth keeping, so I started a curated and quite opinionated knowledge base for the things I think are important, and the talks are now built from it.
 
 ## Why I keep talking about this
 

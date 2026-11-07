@@ -101,4 +101,8 @@ the post.
 
 Corrections Mattias has made to drafts, newest first. Apply these on top of the rules above.
 
-- (none yet)
+- **Don't overstate his experience or seniority.** No phrasing that implies he has worked
+  longer, done more or held more senior roles than he has said himself. "Mattered for as long
+  as I've been working" was cut for suggesting a longer career than he has. Make a point about
+  the practice ("the basics of good engineering, long before agents") without measuring it
+  against his career.

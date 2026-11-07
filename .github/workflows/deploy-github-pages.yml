@@ -62,6 +62,8 @@ jobs:
         run: npm run build
         env:
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          # Absolute links in the Open Graph tags and share links.
+          SITE_URL: ${{ steps.pages.outputs.base_url }}
 
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'

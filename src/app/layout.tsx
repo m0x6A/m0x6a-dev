@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
+import { SITE_URL } from "@/lib/site";
 import { VIEW_INIT_SCRIPT } from "@/lib/view-mode";
 import "./globals.css";
 
@@ -10,6 +11,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  // Absolute URLs in Open Graph tags (the preview images) resolve against this.
+  metadataBase: new URL(`${SITE_URL}/`),
   title: {
     default: "m0x6a | CLI-inspired portfolio",
     template: "%s | m0x6a",

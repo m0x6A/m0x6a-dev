@@ -11,6 +11,7 @@ import { TmuxShell } from "@/components/tmux-shell";
 import { ViewToggle } from "@/components/view-toggle";
 import { countLines, extractHeadings, readingMinutes } from "@/lib/blog/headings";
 import { getBlogIndex, getBlogPost } from "@/lib/blog/posts";
+import { absoluteUrl, linkedInShareUrl } from "@/lib/site";
 import styles from "../blog.module.css";
 
 type BlogPostPageProps = {
@@ -49,9 +50,37 @@ export async function generateMetadata({
     };
   }
 
+  const { post } = result;
+  const url = absoluteUrl(post.route);
+
+  // LinkedIn and other sites build the link preview from these tags. The image is
+  // the card rendered by og.png/route.tsx.
+  const image = {
+    url: `${url}og.png`,
+    width: 1200,
+    height: 627,
+    alt: `${post.title}: ${post.summary}`,
+  };
   return {
-    title: result.post.title,
-    description: result.post.summary,
+    title: post.title,
+    description: post.summary,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      url,
+      title: post.title,
+      description: post.summary,
+      siteName: "m0x6a",
+      publishedTime: post.publishedAt,
+      authors: ["Mattias Jonsson"],
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.summary,
+      images: [image],
+    },
   };
 }
 
@@ -146,6 +175,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </header>
           <TableOfContents fileName={fileName} headings={headings} />
           <BlogMarkdown content={post.content} />
+          <nav className={styles.share} aria-label="Share">
+            <a
+              href={linkedInShareUrl(absoluteUrl(post.route))}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.shareLink}
+            >
+              <span className={styles.shareCommand}>:share</span> linkedin
+            </a>
+          </nav>
           <BufferNav
             prev={older ? { href: older.route, label: `${older.slug}.md` } : undefined}
             next={newer ? { href: newer.route, label: `${newer.slug}.md` } : undefined}

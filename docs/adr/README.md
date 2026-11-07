@@ -28,3 +28,4 @@ Statuses: `Proposed` · `Accepted` · `Rejected` · `Deprecated` · `Superseded 
 | [0010](0010-static-export-on-github-pages.md) | Static export hosted on GitHub Pages | Accepted |
 | [0011](0011-tmux-neovim-site-interface.md) | tmux and Neovim interface for the site | Superseded by 0012 |
 | [0012](0012-simplify-tmux-shell-navigation.md) | Simplify the tmux shell's navigation and chrome | Accepted |
+| [0013](0013-link-previews-and-linkedin-sharing.md) | Link previews and LinkedIn sharing for posts | Accepted |

@@ -124,3 +124,22 @@
     display: none;
   }
 }
+
+/* `:share linkedin` under a post. */
+.share {
+  margin-top: 2rem;
+}
+
+.shareLink {
+  color: var(--nv-blue);
+}
+
+.shareLink:hover,
+.shareLink:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.shareCommand {
+  color: var(--nv-muted);
+}

@@ -11,7 +11,7 @@ I work as Lead Technologist at Sogeti, and I've been holding quite a lot of talk
 
 Most of what I talk about is old. Feedback loops, understanding what happens in production, making small changes that are safe to ship, and owning what you ship are the basics of good engineering, and they were long before agents came along. What has changed is the speed and the scale, and who or what writes the code. When agents write most of a change, all of those fundamentals get easier to skip, and skipping them costs more than it used to.
 
-So that's the lens for everything, the fundamentals haven't changed but the conditions have. I try to start with the concrete problem, a slow request, an incident at 3 am, a change nobody dares to deploy, before getting into tools, because what I want is for people to understand why and buy into it, and the tools come after that. And when something is presented as new, I want to show what older practice it builds on and what is actually different.
+So that's the lens for everything, the fundamentals haven't changed but the conditions have. I try to start with the concrete problem, a slow request, an incident at 3 am, a change nobody dares to deploy, before getting into tools, because what I want is for people to understand why and buy into it, and the tools come after that. And when something is presented as new, I want to show what older practice it builds on and what is actually different. Quite often I can trace it back to a book I've read, observability-driven development in Observability Engineering, the constraint everything waits on in The Phoenix Project, or Brooks's No Silver Bullet from 1986, which already said that tools can take away a lot of the accidental complexity but never the hard part of deciding what to build.
 
 My most recent talk was about the agentic workflows in PantryPilot, my own product, where agents watch production in Grafana, help review pull requests and write release notes, while a person still decides what actually happens. It was measured on a real codebase, and a lot of what's in the knowledge base started there.
 
@@ -24,6 +24,8 @@ The knowledge base is three documents for now, one on observability and observab
 That's what I mean by curated and opinionated. Everything in it is something I've read, think makes sense and chose to keep. An agent helps me fetch it, summarise it and break it into pieces, but what goes in is my call, and it's all written through the lens above. Every claim also says how far you can lean on it, so a vendor survey, a vendor claim, an analyst forecast and something I measured myself are marked differently, and if it's a vendor claim I say so on the slide too.
 
 The way I think about it, it's a digital twin of my own thinking. What I've read, what I picked out of it and what I think about it, in a form I can reason with together with an agent when I build a talk, and that grows as I read more.
+
+I think the risk with a twin like this is that it slowly turns into summaries of summaries written by agents, a copy of my thinking with nothing original behind it, which is pretty much what Baudrillard describes in Simulacra and Simulation. What keeps it mine is that everything in it is something I've actually read, every claim says what it rests on, and what I think about it is written by me.
 
 ## Turning it into a graph
 

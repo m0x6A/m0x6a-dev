@@ -197,12 +197,12 @@ export const portfolioContent: PortfolioContent = {
         stack: ["ASP.NET Core", "EF Core", "Azure SQL", "React", "Testcontainers"],
       },
       {
-        name: "HIVE",
+        name: "Rubato",
         summary:
-          "A collective-intelligence framework for GitHub Copilot, where capabilities spawn, merge, split and dissolve as the work needs instead of fixed agent roles. Built on Speckit for spec-driven development.",
+          "A lab for agent orchestration across interconnected repositories. One system map sits above the repos, issues are pinned to the parts they touch, and each developer's Claude Code sessions and plans show up on the map. Agents run on each developer's own machine; Rubato keeps the shared picture.",
         impact: "agentic",
-        stack: ["GitHub Copilot", "Custom agents", "Speckit"],
-        href: "https://github.com/m0x6A/copilot-hive",
+        stack: ["Rust", "React Flow", "Claude Code", "tmux", "OpenTelemetry"],
+        href: "https://github.com/m0x6A/rubato",
       },
     ],
   },

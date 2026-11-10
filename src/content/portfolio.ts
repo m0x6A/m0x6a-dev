@@ -165,7 +165,7 @@ export const portfolioContent: PortfolioContent = {
       {
         name: "Quality and agentic development",
         detail: "Tests, specifications and agents that work from them.",
-        items: ["xUnit", "Testcontainers", "Gherkin", "GitHub Copilot", "Claude Code", "Speckit"],
+        items: ["xUnit", "Testcontainers", "Gherkin", "GitHub Copilot", "Claude Code", "Spec-driven development"],
       },
     ],
   },
